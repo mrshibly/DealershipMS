@@ -1,0 +1,103 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Hind+Siliguri:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+
+  html {
+    font-family: 'Inter', 'Hind Siliguri', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body {
+    @apply bg-background text-text;
+    margin: 0;
+    padding: 0;
+  }
+
+  /* Bangla text class */
+  .font-bn {
+    font-family: 'Hind Siliguri', sans-serif;
+  }
+}
+
+@layer components {
+  /* Buttons */
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2 bg-primary text-white rounded-lg font-medium text-sm transition-colors hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2 bg-surface border border-border text-text rounded-lg font-medium text-sm transition-colors hover:bg-background focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:opacity-50;
+  }
+
+  .btn-danger {
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2 bg-danger text-white rounded-lg font-medium text-sm transition-colors hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-danger focus:ring-offset-2 disabled:opacity-50;
+  }
+
+  /* Form inputs */
+  .input {
+    @apply w-full px-3 py-2 border border-border rounded-lg text-sm text-text bg-surface placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-shadow;
+  }
+
+  .input-error {
+    @apply border-danger focus:ring-danger;
+  }
+
+  .label {
+    @apply block text-sm font-medium text-text mb-1;
+  }
+
+  .error-msg {
+    @apply text-xs text-danger mt-1;
+  }
+
+  /* Cards */
+  .card {
+    @apply bg-surface rounded-xl border border-border shadow-card p-6;
+  }
+
+  /* Table */
+  .table-wrapper {
+    @apply overflow-x-auto rounded-xl border border-border;
+  }
+
+  .table {
+    @apply w-full text-sm;
+  }
+
+  .table thead tr {
+    @apply bg-primary text-white;
+  }
+
+  .table thead th {
+    @apply px-4 py-3 text-left font-medium;
+  }
+
+  .table tbody tr {
+    @apply border-b border-border hover:bg-background transition-colors;
+  }
+
+  .table tbody tr:nth-child(even) {
+    @apply bg-background;
+  }
+
+  .table tbody td {
+    @apply px-4 py-3;
+  }
+
+  /* Badges */
+  .badge {
+    @apply inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium;
+  }
+
+  .badge-success { @apply bg-success-light text-success; }
+  .badge-warning { @apply bg-warning-light text-warning; }
+  .badge-danger  { @apply bg-danger-light text-danger; }
+  .badge-info    { @apply bg-primary-light text-primary; }
+}

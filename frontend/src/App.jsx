@@ -1,0 +1,103 @@
+/**
+ * App.jsx — React Router v6 root.
+ * Sets up QueryClient, i18n, and routing.
+ */
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import './i18n/index.js';
+
+import ProtectedRoute from './components/ProtectedRoute';
+import AppLayout from './components/Layout/AppLayout';
+import Login from './pages/Login';
+import Dashboard from './pages/Dashboard';
+
+// Sprint 1 pages
+import ProductList from './pages/Products/ProductList';
+import ProductForm from './pages/Products/ProductForm';
+import StockView from './pages/Inventory/StockView';
+import SupplierList from './pages/Suppliers/SupplierList';
+import SupplierForm from './pages/Suppliers/SupplierForm';
+import PurchaseList from './pages/Purchases/PurchaseList';
+import PurchaseForm from './pages/Purchases/PurchaseForm';
+
+// Sprint 2 pages
+import RouteList from './pages/Routes/RouteList';
+import RouteForm from './pages/Routes/RouteForm';
+import DealerList from './pages/Dealers/DealerList';
+import DealerForm from './pages/Dealers/DealerForm';
+import DSRList from './pages/DSRs/DSRList';
+import DSRForm from './pages/DSRs/DSRForm';
+import ShopList from './pages/Shops/ShopList';
+import ShopForm from './pages/Shops/ShopForm';
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: { retry: 1, staleTime: 30_000 },
+  },
+});
+
+export default function App() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <Routes>
+          {/* Public */}
+          <Route path="/login" element={<Login />} />
+
+          {/* Protected */}
+          <Route element={<ProtectedRoute />}>
+            <Route element={<AppLayout />}>
+              <Route index element={<Navigate to="/dashboard" replace />} />
+              <Route path="/dashboard" element={<Dashboard />} />
+
+              {/* Sprint 1 — Products & Inventory */}
+              <Route path="/products"         element={<ProductList />} />
+              <Route path="/products/new"     element={<ProductForm />} />
+              <Route path="/products/:id/edit" element={<ProductForm />} />
+              <Route path="/inventory"        element={<StockView />} />
+              <Route path="/suppliers"        element={<SupplierList />} />
+              <Route path="/suppliers/new"    element={<SupplierForm />} />
+              <Route path="/suppliers/:id/edit" element={<SupplierForm />} />
+              <Route path="/purchases"        element={<PurchaseList />} />
+              <Route path="/purchases/new"    element={<PurchaseForm />} />
+
+              {/* Sprint 2 — People & Routes */}
+              <Route path="/dealers"          element={<DealerList />} />
+              <Route path="/dealers/new"      element={<DealerForm />} />
+              <Route path="/dealers/:id/edit"  element={<DealerForm />} />
+              <Route path="/shops"            element={<ShopList />} />
+              <Route path="/shops/new"        element={<ShopForm />} />
+              <Route path="/shops/:id/edit"    element={<ShopForm />} />
+              <Route path="/dsrs"             element={<DSRList />} />
+              <Route path="/dsrs/new"         element={<DSRForm />} />
+              <Route path="/dsrs/:id/edit"     element={<DSRForm />} />
+              <Route path="/routes"           element={<RouteList />} />
+              <Route path="/routes/new"       element={<RouteForm />} />
+              <Route path="/routes/:id/edit"   element={<RouteForm />} />
+
+              {/* Sprint 3+ — Coming soon */}
+              <Route path="/invoices"    element={<ComingSoon module="Invoices" />} />
+              <Route path="/collections" element={<ComingSoon module="Collections" />} />
+              <Route path="/accounts"    element={<ComingSoon module="Accounts" />} />
+              <Route path="/expenses"    element={<ComingSoon module="Expenses" />} />
+              <Route path="/reports"     element={<ComingSoon module="Reports" />} />
+              <Route path="/settings"    element={<ComingSoon module="Settings" />} />
+            </Route>
+          </Route>
+
+          <Route path="*" element={<Navigate to="/dashboard" replace />} />
+        </Routes>
+      </BrowserRouter>
+    </QueryClientProvider>
+  );
+}
+
+function ComingSoon({ module }) {
+  return (
+    <div className="flex flex-col items-center justify-center h-64 gap-3">
+      <div className="text-4xl">🚧</div>
+      <h2 className="text-xl font-semibold text-text">{module}</h2>
+      <p className="text-text-muted text-sm">Coming in a future sprint</p>
+    </div>
+  );
+}
