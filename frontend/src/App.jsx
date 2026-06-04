@@ -27,8 +27,10 @@ import DealerList from './pages/Dealers/DealerList';
 import DealerForm from './pages/Dealers/DealerForm';
 import DSRList from './pages/DSRs/DSRList';
 import DSRForm from './pages/DSRs/DSRForm';
+import DSRLedger from './pages/DSRs/DSRLedger';
 import ShopList from './pages/Shops/ShopList';
 import ShopForm from './pages/Shops/ShopForm';
+import BarcodePrint from './pages/Products/BarcodePrint';
 
 // Sprint 3 pages
 import InvoiceList from './pages/Invoices/InvoiceList';
@@ -76,9 +78,11 @@ export default function App() {
               <Route path="/dsrs"             element={<DSRList />} />
               <Route path="/dsrs/new"         element={<DSRForm />} />
               <Route path="/dsrs/:id/edit"     element={<DSRForm />} />
+              <Route path="/dsrs/:id/ledger"   element={<DSRLedger />} />
               <Route path="/routes"           element={<RouteList />} />
               <Route path="/routes/new"       element={<RouteForm />} />
               <Route path="/routes/:id/edit"   element={<RouteForm />} />
+              <Route path="/barcodes"         element={<BarcodePrint />} />
 
               {/* Sprint 3 — Invoices & Collections */}
               <Route path="/invoices"         element={<InvoiceList />} />

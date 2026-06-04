@@ -135,3 +135,41 @@ async def get_barcode(
         media_type="image/png",
         headers={"Content-Disposition": f'attachment; filename="{product.sku}.png"'},
     )
+
+
+from fastapi import Body
+from typing import List as TList
+
+@router.post("/barcode-sheet", summary="Generate A4 barcode sheet PDF for selected products")
+async def generate_barcode_sheet(
+    product_ids: TList[uuid.UUID] = Body(..., embed=True),
+    copies: int = Body(1, embed=True),
+    db: AsyncSession = Depends(get_db),
+    _=Depends(require_permission("products", "view")),
+):
+    """Generate a printable A4 PDF sheet of barcodes for the selected products (3-up layout)."""
+    from app.utils.barcode_sheet import generate_barcode_sheet_pdf
+    from sqlalchemy import select as sa_select
+    from app.models.product import Product
+
+    result = await db.execute(
+        sa_select(Product).where(Product.id.in_(product_ids), Product.is_deleted.is_(False))
+    )
+    products = result.scalars().all()
+
+    product_data = [
+        {
+            "name": p.name,
+            "sku": p.sku or "",
+            "barcode": p.barcode or p.sku or str(p.id)[:12],
+            "price": str(p.price),
+        }
+        for p in products
+    ]
+
+    pdf_bytes = generate_barcode_sheet_pdf(product_data, copies=copies)
+    return Response(
+        content=pdf_bytes,
+        media_type="application/pdf",
+        headers={"Content-Disposition": 'attachment; filename="barcode-sheet.pdf"'},
+    )

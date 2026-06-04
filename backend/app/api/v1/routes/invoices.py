@@ -6,6 +6,7 @@ from datetime import date
 from typing import Optional
 
 from fastapi import APIRouter, Depends, Query, Path
+from fastapi.responses import Response
 
 from app.core.database import get_db
 from app.core.security import require_permission, get_current_user
@@ -96,3 +97,56 @@ async def void_invoice(
     """Void an invoice (soft delete + reverse stock if confirmed)"""
     invoice = await invoice_service.void_invoice(db, id, current_user.id)
     return SuccessResponse(data=invoice)
+
+
+@router.get("/{id}/pdf", summary="Download invoice as PDF")
+async def download_invoice_pdf(
+    id: uuid.UUID = Path(...),
+    db = Depends(get_db),
+    current_user: User = Depends(require_permission("invoices", "read"))
+):
+    """Generate and download an NBR-compliant PDF for the invoice"""
+    from app.utils.pdf import generate_invoice_pdf
+    invoice = await invoice_service.get_invoice_detail(db, id)
+
+    # Build the data dict for the PDF generator
+    data = {
+        "invoice_no": invoice.invoice_no,
+        "date": str(invoice.date),
+        "status": invoice.status.value,
+        "dealer_name": invoice.dealer.name if invoice.dealer else "-",
+        "dealer_address": invoice.dealer.address if invoice.dealer else "",
+        "dealer_phone": invoice.dealer.phone if invoice.dealer else "",
+        "dsr_name": invoice.dsr.name if invoice.dsr else "-",
+        "shop_name": invoice.shop.name if invoice.shop else "-",
+        "items": [
+            {
+                "name": item.product.name if item.product else str(item.product_id),
+                "total_pieces": item.total_pieces,
+                "unit_price": item.unit_price,
+                "vat_rate": item.vat_rate,
+                "vat_amount": item.vat_amount,
+                "line_total": item.line_total,
+                "is_free_item": item.is_free_item,
+            }
+            for item in invoice.items
+        ],
+        "subtotal": invoice.subtotal,
+        "discount": invoice.discount,
+        "vat_amount": invoice.vat_amount,
+        "grand_total": invoice.grand_total,
+        "paid_amount": invoice.paid_amount,
+        # Company info – will be replaced with real settings in Sprint 4
+        "company_name": "Dealership Management System",
+        "company_address": "Dhaka, Bangladesh",
+        "company_phone": "+880 1700-000000",
+        "company_vat_bin": "N/A",
+    }
+
+    pdf_bytes = generate_invoice_pdf(data)
+    filename = f"invoice-{invoice.invoice_no}.pdf"
+    return Response(
+        content=pdf_bytes,
+        media_type="application/pdf",
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+    )

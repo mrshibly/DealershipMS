@@ -27,6 +27,7 @@
     "routes": "রুট",
     "invoices": "ইনভয়েস",
     "collections": "সংগ্রহ",
+    "barcodes": "বারকোড",
     "accounts": "হিসাব",
     "expenses": "খরচ",
     "reports": "রিপোর্ট",
@@ -191,7 +192,23 @@
     "add": "ডিএসআর যোগ করুন",
     "edit": "ডিএসআর সম্পাদনা",
     "search": "নাম, ফোন বা এনআইডি দিয়ে খুঁজুন",
-    "confirm_delete": "এই ডিএসআর মুছবেন?"
+    "confirm_delete": "এই ডিএসআর মুছবেন?",
+    "view_ledger": "লেজার দেখুন",
+    "ledger_subtitle": "বিক্রয় লেজার ও কমিশন",
+    "total_sales": "মোট বিক্রয়",
+    "total_collected": "মোট সংগ্রহ",
+    "outstanding": "বকেয়া",
+    "commission_earned": "অর্জিত কমিশন",
+    "invoice_ledger": "ইনভয়েস লেজার",
+    "running_balance": "চলমান ব্যালেন্স"
+  },
+  "barcodes": {
+    "title": "বারকোড প্রিন্ট শিট",
+    "subtitle": "পণ্য বেছে নিন এবং A4 বারকোড শিট ডাউনলোড করুন",
+    "copies": "কপি সংখ্যা",
+    "print_selected": "শিট ডাউনলোড করুন",
+    "selected": "পণ্য বেছে নেওয়া হয়েছে",
+    "select_hint": "পণ্য বেছে নিতে ক্লিক করুন"
   },
   "invoices": {
     "invoice_no": "ইনভয়েস নং",
@@ -232,7 +249,8 @@
     "collect_payment": "পেমেন্ট সংগ্রহ",
     "void_title": "ইনভয়েস বাতিল করুন",
     "void_warning": "আপনি কি নিশ্চিত যে আপনি এই ইনভয়েসটি বাতিল করতে চান?",
-    "void_confirm": "হ্যাঁ, বাতিল করুন"
+    "void_confirm": "হ্যাঁ, বাতিল করুন",
+    "download_pdf": "PDF ডাউনলোড"
   },
   "common": {
     "loading": "লোড হচ্ছে...",
@@ -246,6 +264,7 @@
     "export": "রপ্তানি",
     "print": "প্রিন্ট",
     "add_new": "নতুন যোগ করুন",
+    "add": "যোগ করুন",
     "confirm": "নিশ্চিত করুন",
     "total": "মোট",
     "status": "অবস্থা",
@@ -257,7 +276,14 @@
     "active": "সক্রিয়",
     "inactive": "নিষ্ক্রিয়",
     "phone": "ফোন",
-    "actions": "কার্যক্রম"
+    "actions": "কার্যক্রম",
+    "optional": "বৈকল্পিক",
+    "select": "বেছে নিন",
+    "all": "সব",
+    "from": "থেকে",
+    "to": "পর্যন্ত",
+    "clear": "মুছে দিন",
+    "error": "সমস্যা হয়েছে"
   },
   "permission_denied": "আপনার এই কাজের অনুমতি নেই"
 }

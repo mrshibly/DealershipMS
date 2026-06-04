@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import { Plus, Edit, Trash2 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { Plus, Edit, Trash2, BookOpen } from 'lucide-react';
+import { useNavigate, Link } from 'react-router-dom';
 import api from '../../utils/api';
 import { formatDate } from '../../utils/formatters';
 import Table from '../../components/ui/Table';
@@ -60,6 +60,9 @@ export default function DSRList() {
       label: t('common.actions'),
       render: (id) => (
         <div className="flex gap-1">
+          <Link to={`/dsrs/${id}/ledger`} className="p-1.5 rounded hover:bg-primary/10 text-text-muted hover:text-primary" title={t('dsr.view_ledger')}>
+            <BookOpen className="w-4 h-4" />
+          </Link>
           <button onClick={() => navigate(`/dsrs/${id}/edit`)} className="p-1.5 rounded hover:bg-primary-light text-text-muted hover:text-primary">
             <Edit className="w-4 h-4" />
           </button>

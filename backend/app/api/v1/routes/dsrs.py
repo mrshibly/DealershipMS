@@ -86,3 +86,24 @@ async def delete_dsr(
     if not deleted:
         raise HTTPException(status_code=404, detail="DSR not found")
     return SuccessResponse(data={}, message="DSR deleted")
+
+
+from datetime import date as DateType
+from app.services import dsr_ledger_service
+
+
+@router.get("/{dsr_id}/ledger", response_model=SuccessResponse[dict])
+async def get_dsr_ledger(
+    dsr_id: uuid.UUID = Path(...),
+    date_from: DateType | None = Query(default=None),
+    date_to: DateType | None = Query(default=None),
+    db: AsyncSession = Depends(get_db),
+    _=Depends(require_permission("dsrs", "view")),
+):
+    """Get DSR ledger: invoices, collections, commission summary."""
+    ledger = await dsr_ledger_service.get_dsr_ledger(
+        db, dsr_id, date_from=date_from, date_to=date_to
+    )
+    if not ledger:
+        raise HTTPException(status_code=404, detail="DSR not found")
+    return SuccessResponse(data=ledger)

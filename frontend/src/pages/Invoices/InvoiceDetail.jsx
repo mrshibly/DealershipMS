@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, CheckCircle, XCircle, Printer, DollarSign, AlertTriangle } from 'lucide-react';
+import { ArrowLeft, CheckCircle, XCircle, Download, DollarSign, AlertTriangle } from 'lucide-react';
 import api from '../../utils/api';
 import { formatCurrency, formatDate } from '../../utils/formatters';
 import Modal from '../../components/ui/Modal';
@@ -109,9 +109,24 @@ export default function InvoiceDetail() {
         </div>
         
         <div className="flex gap-3">
-          <button className="btn-secondary" onClick={() => window.print()}>
-            <Printer className="w-4 h-4 mr-2" />
-            {t('common.print')}
+          <button
+            className="btn-secondary"
+            onClick={async () => {
+              try {
+                const res = await api.get(`/invoices/${id}/pdf`, { responseType: 'blob' });
+                const url = window.URL.createObjectURL(new Blob([res.data], { type: 'application/pdf' }));
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `invoice-${invoice.invoice_no}.pdf`;
+                a.click();
+                window.URL.revokeObjectURL(url);
+              } catch (e) {
+                alert('Failed to download PDF');
+              }
+            }}
+          >
+            <Download className="w-4 h-4 mr-2" />
+            {t('invoices.download_pdf')}
           </button>
           
           {canVoid && (
