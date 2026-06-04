@@ -1,6 +1,8 @@
 from app.models.category import Category
+from app.models.collection import Collection
 from app.models.dealer import Dealer
 from app.models.dsr import DSR
+from app.models.invoice import Invoice, InvoiceItem
 from app.models.product import Product
 from app.models.purchase import Purchase, PurchaseItem
 from app.models.role import Role
@@ -12,8 +14,11 @@ from app.models.user import User
 
 __all__ = [
     "Category",
+    "Collection",
     "Dealer",
     "DSR",
+    "Invoice",
+    "InvoiceItem",
     "Product",
     "Purchase",
     "PurchaseItem",

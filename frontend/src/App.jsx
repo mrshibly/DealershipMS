@@ -30,6 +30,11 @@ import DSRForm from './pages/DSRs/DSRForm';
 import ShopList from './pages/Shops/ShopList';
 import ShopForm from './pages/Shops/ShopForm';
 
+// Sprint 3 pages
+import InvoiceList from './pages/Invoices/InvoiceList';
+import InvoiceForm from './pages/Invoices/InvoiceForm';
+import InvoiceDetail from './pages/Invoices/InvoiceDetail';
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: { retry: 1, staleTime: 30_000 },
@@ -75,8 +80,10 @@ export default function App() {
               <Route path="/routes/new"       element={<RouteForm />} />
               <Route path="/routes/:id/edit"   element={<RouteForm />} />
 
-              {/* Sprint 3+ — Coming soon */}
-              <Route path="/invoices"    element={<ComingSoon module="Invoices" />} />
+              {/* Sprint 3 — Invoices & Collections */}
+              <Route path="/invoices"         element={<InvoiceList />} />
+              <Route path="/invoices/new"     element={<InvoiceForm />} />
+              <Route path="/invoices/:id"     element={<InvoiceDetail />} />
               <Route path="/collections" element={<ComingSoon module="Collections" />} />
               <Route path="/accounts"    element={<ComingSoon module="Accounts" />} />
               <Route path="/expenses"    element={<ComingSoon module="Expenses" />} />

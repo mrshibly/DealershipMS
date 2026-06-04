@@ -16,6 +16,7 @@ from app.api.v1.routes import routes as routes_router
 from app.api.v1.routes import dealers as dealers_router
 from app.api.v1.routes import dsrs as dsrs_router
 from app.api.v1.routes import shops as shops_router
+from app.api.v1.routes import invoices as invoices_router
 from app.api.v1.routes.products import cat_router as categories_router
 from app.core.config import get_settings
 # Import all models to register them with SQLAlchemy metadata
@@ -97,3 +98,4 @@ app.include_router(routes_router.router, prefix="/api/v1")
 app.include_router(dealers_router.router, prefix="/api/v1")
 app.include_router(dsrs_router.router, prefix="/api/v1")
 app.include_router(shops_router.router, prefix="/api/v1")
+app.include_router(invoices_router.router, prefix="/api/v1")
