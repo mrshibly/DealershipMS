@@ -50,6 +50,15 @@ import DaybookReport from './pages/Reports/DaybookReport';
 import SalesProfitReport from './pages/Reports/SalesProfitReport';
 import StockMovementReport from './pages/Reports/StockMovementReport';
 
+// Sprint 7 pages
+import SettingsLayout from './pages/Settings/SettingsLayout';
+import CompanySettings from './pages/Settings/CompanySettings';
+import SmsSettings from './pages/Settings/SmsSettings';
+import RoleList from './pages/Settings/RoleList';
+import RoleForm from './pages/Settings/RoleForm';
+import UserList from './pages/Settings/UserList';
+import UserForm from './pages/Settings/UserForm';
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: { retry: 1, staleTime: 30_000 },
@@ -119,7 +128,17 @@ export default function App() {
 
               {/* Placeholder routes for upcoming modules */}
               <Route path="/collections" element={<ComingSoon module="Collections" />} />
-              <Route path="/settings"    element={<ComingSoon module="Settings" />} />
+              
+              {/* Sprint 7 — Settings */}
+              <Route path="/settings" element={<SettingsLayout />}>
+                <Route index element={<CompanySettings />} />
+                <Route path="company" element={<CompanySettings />} />
+                <Route path="sms" element={<SmsSettings />} />
+                <Route path="roles" element={<RoleList />} />
+                <Route path="roles/:id" element={<RoleForm />} />
+                <Route path="users" element={<UserList />} />
+                <Route path="users/:id" element={<UserForm />} />
+              </Route>
             </Route>
           </Route>
 

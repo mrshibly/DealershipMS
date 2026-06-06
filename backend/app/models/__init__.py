@@ -10,6 +10,7 @@ from app.models.product import Product
 from app.models.purchase import Purchase, PurchaseItem
 from app.models.role import Role
 from app.models.route import Route
+from app.models.setting import Setting
 from app.models.shop import Shop
 from app.models.stock_movement import StockMovement
 from app.models.supplier import Supplier
@@ -32,6 +33,7 @@ __all__ = [
     "PurchaseItem",
     "Role",
     "Route",
+    "Setting",
     "Shop",
     "StockMovement",
     "Supplier",

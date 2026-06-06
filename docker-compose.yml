@@ -56,6 +56,24 @@ services:
       timeout: 10s
       retries: 3
 
+  worker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: dms_worker
+    restart: unless-stopped
+    env_file:
+      - .env
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app
+    command: >
+      sh -c "celery -A app.worker.celery_app worker --loglevel=info"
+
   frontend:
     build:
       context: ./frontend
