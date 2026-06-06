@@ -28,11 +28,12 @@
     "invoices": "ইনভয়েস",
     "collections": "সংগ্রহ",
     "barcodes": "বারকোড",
-    "accounts": "হিসাব",
-    "expenses": "খরচ",
-    "reports": "রিপোর্ট",
+    "accounts": "অ্যাকাউন্টস",
+    "reports": "রিপোর্টস",
     "settings": "সেটিংস",
-    "logout": "লগআউট"
+    "logout": "লগআউট",
+    "targets": "লক্ষ্যমাত্রা (Targets)",
+    "returns": "রিটার্নস (Returns)"
   },
   "common": {
     "loading": "লোড হচ্ছে...",

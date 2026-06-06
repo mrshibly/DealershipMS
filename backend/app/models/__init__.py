@@ -14,6 +14,8 @@ from app.models.setting import Setting
 from app.models.shop import Shop
 from app.models.stock_movement import StockMovement
 from app.models.supplier import Supplier
+from app.models.target import Target
+from app.models.return_log import ReturnLog
 from app.models.user import User
 
 __all__ = [
@@ -37,5 +39,7 @@ __all__ = [
     "Shop",
     "StockMovement",
     "Supplier",
+    "Target",
+    "ReturnLog",
     "User",
 ]

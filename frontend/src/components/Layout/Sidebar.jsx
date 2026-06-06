@@ -26,6 +26,12 @@ import {
   ChevronRight,
   ChevronDown,
   Package2,
+  PackageSearch,
+  UserSquare,
+  CreditCard,
+  Settings as SettingsIcon,
+  Target,
+  RotateCcw,
 } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import api from '../../utils/api';
@@ -73,7 +79,11 @@ const NAV_GROUPS = [
   },
   {
     label: 'nav.settings',
-    items: [{ key: 'settings', label: 'nav.settings', icon: Settings, to: '/settings' }],
+    items: [
+      { key: 'targets',  label: 'nav.targets',  icon: Target,       to: '/targets' },
+      { key: 'returns',  label: 'nav.returns',  icon: RotateCcw,    to: '/returns' },
+      { key: 'settings', label: 'nav.settings', icon: SettingsIcon, to: '/settings' },
+    ],
   },
 ];
 

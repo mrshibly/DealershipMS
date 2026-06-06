@@ -19,6 +19,7 @@ from app.models.product import Product
 from app.models.stock_movement import StockMovement, MovementType
 from app.schemas.invoice import InvoiceCreate
 from app.schemas.collection import CollectPaymentRequest
+from app.services.sms_service import send_sms_notification
 
 
 async def generate_invoice_number(db: AsyncSession) -> str:
@@ -260,6 +261,15 @@ async def collect_payment(db: AsyncSession, invoice_id: uuid.UUID, data: Collect
         invoice.status = InvoiceStatus.PARTIAL
         
     await db.commit()
+    await db.refresh(invoice)
+    
+    # Send SMS Receipt via Celery
+    inv_result = await db.execute(select(Invoice).options(selectinload(Invoice.shop)).where(Invoice.id == invoice_id))
+    inv = inv_result.scalar_one_or_none()
+    if inv and inv.shop and inv.shop.phone:
+        message = f"Dear {inv.shop.name}, we have received {float(data.amount)} BDT against Invoice {inv.invoice_no}. Thank you."
+        await send_sms_notification(db, inv.shop.phone, message)
+
     return await get_invoice_detail(db, invoice_id)
 
 

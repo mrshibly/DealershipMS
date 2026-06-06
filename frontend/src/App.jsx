@@ -59,6 +59,12 @@ import RoleForm from './pages/Settings/RoleForm';
 import UserList from './pages/Settings/UserList';
 import UserForm from './pages/Settings/UserForm';
 
+// Sprint 8 pages
+import TargetList from './pages/Targets/TargetList';
+import TargetForm from './pages/Targets/TargetForm';
+import ReturnList from './pages/Returns/ReturnList';
+import ReturnForm from './pages/Returns/ReturnForm';
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: { retry: 1, staleTime: 30_000 },
@@ -129,6 +135,15 @@ export default function App() {
               {/* Placeholder routes for upcoming modules */}
               <Route path="/collections" element={<ComingSoon module="Collections" />} />
               
+              {/* Sprint 8 — Targets & Returns */}
+              <Route path="/targets" element={<TargetList />} />
+              <Route path="/targets/new" element={<TargetForm />} />
+              <Route path="/targets/:id" element={<TargetForm />} />
+              
+              <Route path="/returns" element={<ReturnList />} />
+              <Route path="/returns/new" element={<ReturnForm />} />
+              <Route path="/returns/:id" element={<ReturnForm />} />
+
               {/* Sprint 7 — Settings */}
               <Route path="/settings" element={<SettingsLayout />}>
                 <Route index element={<CompanySettings />} />

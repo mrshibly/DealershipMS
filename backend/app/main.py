@@ -96,6 +96,8 @@ from app.api.v1.routes import dashboard as dashboard_router
 from app.api.v1.routes import roles as roles_router
 from app.api.v1.routes import users as users_router
 from app.api.v1.routes import settings as settings_router
+from app.api.v1.routes import targets as targets_router
+from app.api.v1.routes import returns as returns_router
 
 app.include_router(auth_router.router, prefix="/api/v1")
 app.include_router(categories_router, prefix="/api/v1")
@@ -116,3 +118,5 @@ app.include_router(dashboard_router.router, prefix="/api/v1")
 app.include_router(roles_router.router, prefix="/api/v1")
 app.include_router(users_router.router, prefix="/api/v1")
 app.include_router(settings_router.router, prefix="/api/v1")
+app.include_router(targets_router.router, prefix="/api/v1")
+app.include_router(returns_router.router, prefix="/api/v1")
