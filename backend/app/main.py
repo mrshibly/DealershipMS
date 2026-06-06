@@ -92,6 +92,7 @@ from app.api.v1.routes import accounts as accounts_router
 from app.api.v1.routes import expenses as expenses_router
 from app.api.v1.routes import contra as contra_router
 from app.api.v1.routes import reports as reports_router
+from app.api.v1.routes import dashboard as dashboard_router
 
 app.include_router(auth_router.router, prefix="/api/v1")
 app.include_router(categories_router, prefix="/api/v1")
@@ -108,3 +109,4 @@ app.include_router(accounts_router.router, prefix="/api/v1")
 app.include_router(expenses_router.router, prefix="/api/v1")
 app.include_router(contra_router.router, prefix="/api/v1")
 app.include_router(reports_router.router, prefix="/api/v1")
+app.include_router(dashboard_router.router, prefix="/api/v1")

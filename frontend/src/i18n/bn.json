@@ -282,6 +282,19 @@
     "running_balance": "বর্তমান স্টক",
     "notes": "নোট"
   },
+  "dashboard": {
+    "title": "ড্যাশবোর্ড",
+    "subtitle": "আপনার ব্যবসার আজকের অবস্থা এবং পারফরম্যান্স",
+    "today_sales": "আজকের বিক্রয়",
+    "today_collections": "আজকের আদায়",
+    "total_due": "মোট বকেয়া",
+    "total_stock_value": "বর্তমান স্টকের মূল্য",
+    "sales_vs_expenses": "বিক্রয় বনাম খরচ",
+    "last_30_days": "বিগত ৩০ দিন",
+    "last_12_months": "বিগত ১২ মাস",
+    "sales": "বিক্রয়",
+    "expenses": "খরচ"
+  },
   "invoices": {
     "invoice_no": "ইনভয়েস নং",
     "date": "তারিখ",
