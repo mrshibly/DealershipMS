@@ -88,6 +88,10 @@ async def health_check() -> dict:
 # -------------------------------------------------------------------
 # API Routers
 # -------------------------------------------------------------------
+from app.api.v1.routes import accounts as accounts_router
+from app.api.v1.routes import expenses as expenses_router
+from app.api.v1.routes import contra as contra_router
+
 app.include_router(auth_router.router, prefix="/api/v1")
 app.include_router(categories_router, prefix="/api/v1")
 app.include_router(products_router.router, prefix="/api/v1")
@@ -99,3 +103,6 @@ app.include_router(dealers_router.router, prefix="/api/v1")
 app.include_router(dsrs_router.router, prefix="/api/v1")
 app.include_router(shops_router.router, prefix="/api/v1")
 app.include_router(invoices_router.router, prefix="/api/v1")
+app.include_router(accounts_router.router, prefix="/api/v1")
+app.include_router(expenses_router.router, prefix="/api/v1")
+app.include_router(contra_router.router, prefix="/api/v1")

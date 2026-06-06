@@ -37,6 +37,13 @@ import InvoiceList from './pages/Invoices/InvoiceList';
 import InvoiceForm from './pages/Invoices/InvoiceForm';
 import InvoiceDetail from './pages/Invoices/InvoiceDetail';
 
+// Sprint 4 pages
+import AccountList from './pages/Accounts/AccountList';
+import AccountForm from './pages/Accounts/AccountForm';
+import ContraEntryForm from './pages/Accounts/ContraEntryForm';
+import ExpenseList from './pages/Expenses/ExpenseList';
+import ExpenseForm from './pages/Expenses/ExpenseForm';
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: { retry: 1, staleTime: 30_000 },
@@ -88,9 +95,18 @@ export default function App() {
               <Route path="/invoices"         element={<InvoiceList />} />
               <Route path="/invoices/new"     element={<InvoiceForm />} />
               <Route path="/invoices/:id"     element={<InvoiceDetail />} />
+
+              {/* Sprint 4 — Accounts & Finance */}
+              <Route path="/accounts"         element={<AccountList />} />
+              <Route path="/accounts/new"     element={<AccountForm />} />
+              <Route path="/accounts/contra"  element={<ContraEntryForm />} />
+              <Route path="/accounts/:id/edit" element={<AccountForm />} />
+              
+              <Route path="/expenses"         element={<ExpenseList />} />
+              <Route path="/expenses/new"     element={<ExpenseForm />} />
+
+              {/* Placeholder routes for upcoming modules */}
               <Route path="/collections" element={<ComingSoon module="Collections" />} />
-              <Route path="/accounts"    element={<ComingSoon module="Accounts" />} />
-              <Route path="/expenses"    element={<ComingSoon module="Expenses" />} />
               <Route path="/reports"     element={<ComingSoon module="Reports" />} />
               <Route path="/settings"    element={<ComingSoon module="Settings" />} />
             </Route>
