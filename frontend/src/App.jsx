@@ -44,6 +44,12 @@ import ContraEntryForm from './pages/Accounts/ContraEntryForm';
 import ExpenseList from './pages/Expenses/ExpenseList';
 import ExpenseForm from './pages/Expenses/ExpenseForm';
 
+// Sprint 5 pages
+import ReportDashboard from './pages/Reports/ReportDashboard';
+import DaybookReport from './pages/Reports/DaybookReport';
+import SalesProfitReport from './pages/Reports/SalesProfitReport';
+import StockMovementReport from './pages/Reports/StockMovementReport';
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: { retry: 1, staleTime: 30_000 },
@@ -105,9 +111,14 @@ export default function App() {
               <Route path="/expenses"         element={<ExpenseList />} />
               <Route path="/expenses/new"     element={<ExpenseForm />} />
 
+              {/* Sprint 5 — Reports */}
+              <Route path="/reports"                 element={<ReportDashboard />} />
+              <Route path="/reports/daybook"         element={<DaybookReport />} />
+              <Route path="/reports/sales-profit"    element={<SalesProfitReport />} />
+              <Route path="/reports/stock-movement"  element={<StockMovementReport />} />
+
               {/* Placeholder routes for upcoming modules */}
               <Route path="/collections" element={<ComingSoon module="Collections" />} />
-              <Route path="/reports"     element={<ComingSoon module="Reports" />} />
               <Route path="/settings"    element={<ComingSoon module="Settings" />} />
             </Route>
           </Route>
