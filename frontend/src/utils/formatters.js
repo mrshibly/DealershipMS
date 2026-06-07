@@ -19,6 +19,9 @@ export function formatBDT(amount, locale = 'bn-BD') {
   });
 }
 
+// Alias for compatibility
+export const formatCurrency = formatBDT;
+
 /**
  * Format a date as dd/mm/yyyy (BD standard).
  * @param {string|Date} date

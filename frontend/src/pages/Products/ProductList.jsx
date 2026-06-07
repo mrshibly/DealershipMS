@@ -32,7 +32,13 @@ export default function ProductList() {
 
   const deleteMutation = useMutation({
     mutationFn: (id) => api.delete(`/products/${id}`),
-    onSuccess: () => qc.invalidateQueries(['products']),
+    onSuccess: () => {
+      qc.invalidateQueries(['products']);
+      window.dispatchEvent(new CustomEvent('dms:toast', { detail: { message: t('common.delete_success'), type: 'success' } }));
+    },
+    onError: (err) => {
+      window.dispatchEvent(new CustomEvent('dms:toast', { detail: { message: err.response?.data?.detail || t('common.error'), type: 'danger' } }));
+    }
   });
 
   const downloadBarcode = async (productId, sku) => {
@@ -61,6 +67,7 @@ export default function ProductList() {
       ),
     },
     { key: 'sku', label: 'SKU' },
+    { key: 'brand', label: 'Brand', render: (v) => v || '—' },
     {
       key: 'category_name',
       label: t('product.category'),
@@ -115,7 +122,7 @@ export default function ProductList() {
           </button>
           <button
             onClick={() => {
-              if (confirm(t('product.confirm_delete'))) {
+              if (window.confirm(t('common.delete_confirm'))) {
                 deleteMutation.mutate(id);
               }
             }}

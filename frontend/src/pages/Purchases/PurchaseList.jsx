@@ -77,14 +77,14 @@ export default function PurchaseList() {
           {row.status === 'DRAFT' && (
             <>
               <button
-                onClick={() => { if (confirm(t('purchase.confirm_receive'))) receiveMutation.mutate(id); }}
+                onClick={() => { if (window.confirm(t('purchase.confirm_receive'))) receiveMutation.mutate(id); }}
                 title={t('purchase.receive')}
                 className="p-1.5 rounded hover:bg-success-light text-text-muted hover:text-success"
               >
                 <CheckCircle className="w-4 h-4" />
               </button>
               <button
-                onClick={() => { if (confirm(t('purchase.confirm_cancel'))) cancelMutation.mutate(id); }}
+                onClick={() => { if (window.confirm(t('purchase.confirm_cancel'))) cancelMutation.mutate(id); }}
                 title={t('purchase.cancel')}
                 className="p-1.5 rounded hover:bg-danger-light text-text-muted hover:text-danger"
               >

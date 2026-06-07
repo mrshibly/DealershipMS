@@ -49,7 +49,7 @@ async def create_category(
 @router.get("", response_model=PaginatedResponse[ProductRead])
 async def list_products(
     page: int = Query(default=1, ge=1),
-    per_page: int = Query(default=20, ge=1, le=100),
+    per_page: int = Query(default=20, ge=1, le=1000),
     search: str | None = Query(default=None),
     category_id: uuid.UUID | None = Query(default=None),
     is_active: bool | None = Query(default=None),

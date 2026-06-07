@@ -13,11 +13,17 @@ router = APIRouter(prefix="/dashboard", tags=["dashboard"])
 
 @router.get("/snapshot", response_model=SuccessResponse[dict[str, Any]])
 async def get_dashboard_snapshot(
-    target_date: date = Query(default_factory=date.today),
+    date_from: date = Query(None),
+    date_to: date = Query(None),
     db: AsyncSession = Depends(get_db),
     _=Depends(require_permission("reports", "view")),
 ):
-    data = await dashboard_service.get_daily_snapshot(db, target_date)
+    if not date_from:
+        # Default to start of current month
+        date_from = date.today().replace(day=1)
+    if not date_to:
+        date_to = date.today()
+    data = await dashboard_service.get_daily_snapshot(db, date_from, date_to)
     return SuccessResponse(data=data)
 
 @router.get("/analytics", response_model=SuccessResponse[list[dict[str, Any]]])

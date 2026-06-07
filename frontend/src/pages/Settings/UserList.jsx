@@ -17,7 +17,13 @@ export default function UserList() {
 
   const deleteMutation = useMutation({
     mutationFn: (id) => api.delete(`/users/${id}`),
-    onSuccess: () => queryClient.invalidateQueries(['users']),
+    onSuccess: () => {
+      queryClient.invalidateQueries(['users']);
+      window.dispatchEvent(new CustomEvent('dms:toast', { detail: { message: t('common.delete_success'), type: 'success' } }));
+    },
+    onError: (err) => {
+      window.dispatchEvent(new CustomEvent('dms:toast', { detail: { message: err.response?.data?.detail || t('common.error'), type: 'danger' } }));
+    }
   });
 
   const columns = [

@@ -19,6 +19,7 @@ class CollectionBase(BaseModel):
     payment_method: PaymentMethod
     reference_no: Optional[str] = None
     notes: Optional[str] = None
+    account_id: Optional[uuid.UUID] = None
 
 
 class CollectionCreate(CollectionBase):
@@ -32,6 +33,10 @@ class CollectionRead(CollectionBase):
     collected_at: datetime
     is_deleted: bool
     created_at: datetime
+    invoice_no: Optional[str] = None
+    dealer_name: Optional[str] = None
+    dsr_name: Optional[str] = None
+    account_name: Optional[str] = None
 
 
 class CollectPaymentRequest(BaseModel):
@@ -39,3 +44,4 @@ class CollectPaymentRequest(BaseModel):
     payment_method: PaymentMethod
     reference_no: Optional[str] = None
     notes: Optional[str] = None
+    account_id: Optional[uuid.UUID] = None

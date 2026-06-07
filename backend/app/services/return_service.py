@@ -31,11 +31,7 @@ async def create_return(db: AsyncSession, data: ReturnLogCreate) -> ReturnLog:
     )
     db.add(return_log)
     
-    # 2. Update Product Stock
-    result = await db.execute(select(Product).where(Product.id == data.product_id))
-    product = result.scalar_one_or_none()
-    if product:
-        product.stock_pcs += data.qty_returned
+
         
     # 3. Create StockMovement
     movement = StockMovement(

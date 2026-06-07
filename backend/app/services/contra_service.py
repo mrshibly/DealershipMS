@@ -1,4 +1,5 @@
 import uuid
+from datetime import date
 from decimal import Decimal
 
 from sqlalchemy import func, select
@@ -32,9 +33,17 @@ async def list_contra_entries(
     if to_account_id:
         query = query.where(ContraEntry.to_account_id == to_account_id)
     if date_from:
-        query = query.where(ContraEntry.date >= date_from)
+        try:
+            d_from = date.fromisoformat(date_from) if isinstance(date_from, str) else date_from
+            query = query.where(ContraEntry.date >= d_from)
+        except ValueError:
+            pass
     if date_to:
-        query = query.where(ContraEntry.date <= date_to)
+        try:
+            d_to = date.fromisoformat(date_to) if isinstance(date_to, str) else date_to
+            query = query.where(ContraEntry.date <= d_to)
+        except ValueError:
+            pass
 
     count_result = await db.execute(select(func.count()).select_from(query.subquery()))
     total: int = count_result.scalar() or 0

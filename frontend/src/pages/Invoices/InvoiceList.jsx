@@ -26,35 +26,35 @@ export default function InvoiceList() {
 
   const columns = [
     {
-      header: t('invoices.invoice_no'),
-      accessor: 'invoice_no',
-      cell: (val, row) => (
+      key: 'invoice_no',
+      label: t('invoices.invoice_no'),
+      render: (val, row) => (
         <Link to={`/invoices/${row.id}`} className="text-primary font-medium hover:underline">
           {val}
         </Link>
       ),
     },
     {
-      header: t('invoices.date'),
-      accessor: 'date',
-      cell: (val) => formatDate(val),
+      key: 'date',
+      label: t('invoices.date'),
+      render: (val) => formatDate(val),
     },
     {
-      header: t('invoices.grand_total'),
-      accessor: 'grand_total',
-      cell: (val) => formatCurrency(val),
+      key: 'grand_total',
+      label: t('invoices.grand_total'),
+      render: (val) => formatCurrency(val),
       className: 'text-right',
     },
     {
-      header: t('invoices.paid_amount'),
-      accessor: 'paid_amount',
-      cell: (val) => formatCurrency(val),
+      key: 'paid_amount',
+      label: t('invoices.paid_amount'),
+      render: (val) => formatCurrency(val),
       className: 'text-right',
     },
     {
-      header: t('invoices.status'),
-      accessor: 'status',
-      cell: (val) => {
+      key: 'status',
+      label: t('invoices.status'),
+      render: (val) => {
         const colors = {
           DRAFT: 'badge-info',
           CONFIRMED: 'badge-primary',
@@ -66,9 +66,9 @@ export default function InvoiceList() {
       },
     },
     {
-      header: t('common.actions'),
-      id: 'actions',
-      cell: (_, row) => (
+      key: 'id',
+      label: t('common.actions'),
+      render: (_, row) => (
         <div className="flex justify-end gap-2">
           <Link to={`/invoices/${row.id}`} className="btn-icon">
             <Eye className="w-4 h-4 text-text-muted" />
@@ -115,12 +115,13 @@ export default function InvoiceList() {
       </div>
 
       <div className="card p-0 overflow-hidden">
-        <Table columns={columns} data={data?.data || []} isLoading={isLoading} />
+        <Table columns={columns} data={data?.data || []} loading={isLoading} />
         {data?.pages > 1 && (
           <div className="p-4 border-t border-border">
             <Pagination
-              currentPage={page}
-              totalPages={data.pages}
+              page={page}
+              pages={data.pages}
+              total={data.total}
               onPageChange={setPage}
             />
           </div>

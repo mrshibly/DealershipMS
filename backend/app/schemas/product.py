@@ -39,6 +39,7 @@ class CategoryUpdate(BaseModel):
 class ProductCreate(BaseModel):
     name_en: str
     name_bn: str | None = None
+    brand: str | None = None
     sku: str | None = None              # Auto-generated if not provided
     category_id: uuid.UUID | None = None
     unit: str = "piece"
@@ -69,6 +70,7 @@ class ProductRead(BaseModel):
     id: uuid.UUID
     name_en: str
     name_bn: str | None
+    brand: str | None = None
     sku: str
     barcode: str | None
     category_id: uuid.UUID | None
@@ -95,6 +97,7 @@ class ProductRead(BaseModel):
 class ProductUpdate(BaseModel):
     name_en: str | None = None
     name_bn: str | None = None
+    brand: str | None = None
     category_id: uuid.UUID | None = None
     unit: str | None = None
     pcs_per_carton: int | None = Field(default=None, ge=1)

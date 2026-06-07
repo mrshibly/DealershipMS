@@ -34,14 +34,23 @@ export default function AppLayout() {
 
   const titleKey = PAGE_TITLES[location.pathname] || 'nav.dashboard';
 
-  // Listen for 403 forbidden events from api.js interceptor
+  // Listen for 403 forbidden events and general toast events
   useEffect(() => {
-    const handler = (e) => {
+    const forbiddenHandler = (e) => {
       setToast({ type: 'danger', message: e.detail || t('permission_denied') });
       setTimeout(() => setToast(null), 4000);
     };
-    window.addEventListener('dms:forbidden', handler);
-    return () => window.removeEventListener('dms:forbidden', handler);
+    const toastHandler = (e) => {
+      setToast({ type: e.detail.type || 'success', message: e.detail.message });
+      setTimeout(() => setToast(null), 4000);
+    };
+
+    window.addEventListener('dms:forbidden', forbiddenHandler);
+    window.addEventListener('dms:toast', toastHandler);
+    return () => {
+      window.removeEventListener('dms:forbidden', forbiddenHandler);
+      window.removeEventListener('dms:toast', toastHandler);
+    };
   }, [t]);
 
   return (

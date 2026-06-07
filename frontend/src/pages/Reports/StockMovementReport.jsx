@@ -8,7 +8,7 @@ import Table from '../../components/ui/Table';
 import { formatDate } from '../../utils/formatters';
 
 export default function StockMovementReport() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [productId, setProductId] = useState('');
 
   const { data: productsData } = useQuery({
@@ -26,9 +26,19 @@ export default function StockMovementReport() {
     enabled: !!productId,
   });
 
-  const handleExport = () => {
+  const handleExport = async () => {
     if (!productId) return;
-    window.open(`${import.meta.env.VITE_API_URL}/api/v1/reports/stock-movement/${productId}?export=true`, '_blank');
+    try {
+      const res = await api.get(`/reports/stock-movement/${productId}?export=true`, { responseType: 'blob' });
+      const url = window.URL.createObjectURL(new Blob([res.data]));
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `stock-movement-${productId}.xlsx`;
+      a.click();
+      window.URL.revokeObjectURL(url);
+    } catch (e) {
+      alert('Failed to export excel');
+    }
   };
 
   const columns = [
@@ -60,7 +70,7 @@ export default function StockMovementReport() {
           <select className="input" value={productId} onChange={e => setProductId(e.target.value)}>
             <option value="">{t('common.select')}...</option>
             {products.map(p => (
-                <option key={p.id} value={p.id}>[{p.sku}] {p.name_en}</option>
+                <option key={p.id} value={p.id}>[{p.sku}] {i18n.language === 'bn' && p.name_bn ? p.name_bn : p.name_en}</option>
             ))}
           </select>
         </div>

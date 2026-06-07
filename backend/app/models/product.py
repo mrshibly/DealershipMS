@@ -30,6 +30,7 @@ class Product(Base):
     )
     name_en: Mapped[str] = mapped_column(String(300), nullable=False)
     name_bn: Mapped[str | None] = mapped_column(String(300), nullable=True)
+    brand: Mapped[str | None] = mapped_column(String(100), nullable=True, default="N/A")
     sku: Mapped[str] = mapped_column(String(100), unique=True, nullable=False, index=True)
     barcode: Mapped[str | None] = mapped_column(String(100), unique=True, nullable=True, index=True)
     category_id: Mapped[uuid.UUID | None] = mapped_column(
@@ -69,6 +70,10 @@ class Product(Base):
     stock_movements: Mapped[list["StockMovement"]] = relationship(  # noqa: F821
         "StockMovement", back_populates="product"
     )
+
+    @property
+    def name(self) -> str:
+        return self.name_en
 
     def __repr__(self) -> str:
         return f"<Product sku={self.sku!r} name={self.name_en!r}>"

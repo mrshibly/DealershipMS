@@ -91,13 +91,13 @@ async def compute_balance(db: AsyncSession, account_id: uuid.UUID) -> Decimal:
     balance = Decimal(str(account.opening_balance))
 
     # Collections (Inflow)
-    col_result = await db.execute(
+    collections_result = await db.execute(
         select(func.sum(Collection.amount)).where(
             Collection.account_id == account_id,
             Collection.is_deleted.is_(False)
         )
     )
-    collections_sum = col_result.scalar() or Decimal("0.00")
+    collections_sum = collections_result.scalar() or Decimal("0.00")
     balance += collections_sum
 
     # Contra Inflow

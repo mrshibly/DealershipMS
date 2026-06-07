@@ -9,7 +9,7 @@ import './i18n/index.js';
 import ProtectedRoute from './components/ProtectedRoute';
 import AppLayout from './components/Layout/AppLayout';
 import Login from './pages/Login';
-import Dashboard from './pages/Dashboard';
+import Dashboard from './pages/Dashboard/Dashboard';
 
 // Sprint 1 pages
 import ProductList from './pages/Products/ProductList';
@@ -36,6 +36,8 @@ import BarcodePrint from './pages/Products/BarcodePrint';
 import InvoiceList from './pages/Invoices/InvoiceList';
 import InvoiceForm from './pages/Invoices/InvoiceForm';
 import InvoiceDetail from './pages/Invoices/InvoiceDetail';
+import WholesaleAdjustList from './pages/Invoices/WholesaleAdjustList';
+import CollectionList from './pages/Collections/CollectionList';
 
 // Sprint 4 pages
 import AccountList from './pages/Accounts/AccountList';
@@ -115,6 +117,8 @@ export default function App() {
               {/* Sprint 3 — Invoices & Collections */}
               <Route path="/invoices"         element={<InvoiceList />} />
               <Route path="/invoices/new"     element={<InvoiceForm />} />
+              <Route path="/invoices/adjustments" element={<WholesaleAdjustList />} />
+              <Route path="/invoices/:id/edit" element={<InvoiceForm />} />
               <Route path="/invoices/:id"     element={<InvoiceDetail />} />
 
               {/* Sprint 4 — Accounts & Finance */}
@@ -132,8 +136,8 @@ export default function App() {
               <Route path="/reports/sales-profit"    element={<SalesProfitReport />} />
               <Route path="/reports/stock-movement"  element={<StockMovementReport />} />
 
-              {/* Placeholder routes for upcoming modules */}
-              <Route path="/collections" element={<ComingSoon module="Collections" />} />
+              {/* Sprint 3 — Collections */}
+              <Route path="/collections" element={<CollectionList />} />
               
               {/* Sprint 8 — Targets & Returns */}
               <Route path="/targets" element={<TargetList />} />

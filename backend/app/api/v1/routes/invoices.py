@@ -65,6 +65,18 @@ async def get_invoice(
     return SuccessResponse(data=invoice)
 
 
+@router.put("/{id}", response_model=SuccessResponse[InvoiceDetailRead])
+async def update_invoice(
+    id: uuid.UUID = Path(...),
+    data: InvoiceCreate = ...,
+    db = Depends(get_db),
+    current_user: User = Depends(require_permission("invoices", "update"))
+):
+    """Update/Adjust a draft invoice"""
+    invoice = await invoice_service.update_invoice(db, id, data, current_user.id)
+    return SuccessResponse(data=invoice, message="Invoice adjusted successfully")
+
+
 @router.post("/{id}/confirm", response_model=SuccessResponse[InvoiceDetailRead])
 async def confirm_invoice(
     id: uuid.UUID = Path(...),
@@ -121,7 +133,7 @@ async def download_invoice_pdf(
         "shop_name": invoice.shop.name if invoice.shop else "-",
         "items": [
             {
-                "name": item.product.name if item.product else str(item.product_id),
+                "name": item.product.name_en if item.product else str(item.product_id),
                 "total_pieces": item.total_pieces,
                 "unit_price": item.unit_price,
                 "vat_rate": item.vat_rate,

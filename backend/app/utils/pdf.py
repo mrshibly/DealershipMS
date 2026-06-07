@@ -18,9 +18,9 @@ from reportlab.lib.enums import TA_CENTER, TA_RIGHT, TA_LEFT
 
 def _currency(value) -> str:
     try:
-        return f"৳{Decimal(str(value)):,.2f}"
+        return f"Tk. {Decimal(str(value)):,.2f}"
     except Exception:
-        return f"৳0.00"
+        return f"Tk. 0.00"
 
 
 def generate_invoice_pdf(invoice_data: dict) -> bytes:

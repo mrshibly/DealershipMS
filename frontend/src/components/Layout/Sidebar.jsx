@@ -32,6 +32,8 @@ import {
   Settings as SettingsIcon,
   Target,
   RotateCcw,
+  PlusCircle,
+  FileEdit,
 } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import api from '../../utils/api';
@@ -44,8 +46,12 @@ const NAV_GROUPS = [
   {
     label: 'Sales',
     items: [
-      { key: 'invoices',    label: 'nav.invoices',    icon: FileText,    to: '/invoices' },
-      { key: 'collections', label: 'nav.collections', icon: Wallet,      to: '/collections' },
+      { key: 'add-wholesale',      label: 'nav.add_wholesale',          icon: PlusCircle,   to: '/invoices/new' },
+      { key: 'invoices',           label: 'nav.wholesale_list',          icon: FileText,     to: '/invoices' },
+      { key: 'wholesale-adjust',   label: 'nav.wholesale_adjust_list',   icon: FileEdit,     to: '/invoices/adjustments' },
+      { key: 'returns',            label: 'nav.bulk_return',             icon: RotateCcw,    to: '/returns' },
+      { key: 'collections',        label: 'nav.due_collection',          icon: Wallet,       to: '/collections' },
+      { key: 'targets',            label: 'nav.dsr_target',              icon: Target,       to: '/targets' },
     ],
   },
   {
@@ -80,8 +86,6 @@ const NAV_GROUPS = [
   {
     label: 'nav.settings',
     items: [
-      { key: 'targets',  label: 'nav.targets',  icon: Target,       to: '/targets' },
-      { key: 'returns',  label: 'nav.returns',  icon: RotateCcw,    to: '/returns' },
       { key: 'settings', label: 'nav.settings', icon: SettingsIcon, to: '/settings' },
     ],
   },
@@ -139,6 +143,7 @@ export default function Sidebar() {
                 key={item.key}
                 to={item.to}
                 id={`nav-${item.key}`}
+                end
                 className={({ isActive }) =>
                   `flex items-center gap-3 px-2 py-2 rounded-lg text-sm font-medium transition-colors group ${
                     isActive

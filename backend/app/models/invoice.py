@@ -86,6 +86,18 @@ class Invoice(Base):
     def __repr__(self) -> str:
         return f"<Invoice {self.invoice_no} status={self.status}>"
 
+    @property
+    def dealer_name(self) -> str | None:
+        return self.dealer.name if self.dealer else None
+
+    @property
+    def dsr_name(self) -> str | None:
+        return self.dsr.name if self.dsr else None
+
+    @property
+    def route_name(self) -> str | None:
+        return self.dsr.route.name if (self.dsr and self.dsr.route) else None
+
 
 class InvoiceItem(Base):
     __tablename__ = "invoice_items"

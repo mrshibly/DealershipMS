@@ -17,6 +17,7 @@ from app.models.collection import Collection, PaymentMethod
 from app.models.invoice import Invoice, InvoiceItem, InvoiceStatus
 from app.models.product import Product
 from app.models.stock_movement import StockMovement, MovementType
+from app.models.dsr import DSR
 from app.schemas.invoice import InvoiceCreate
 from app.schemas.collection import CollectPaymentRequest
 from app.services.sms_service import send_sms_notification
@@ -27,33 +28,44 @@ async def generate_invoice_number(db: AsyncSession) -> str:
     year = datetime.utcnow().year
     prefix = f"INV-{year}-"
     
-    # Get latest invoice number for this year
+    # Select all invoice numbers for this year to find the true numeric maximum
     stmt = select(Invoice.invoice_no).where(
         Invoice.invoice_no.like(f"{prefix}%")
-    ).order_by(desc(Invoice.invoice_no)).limit(1)
-    
+    )
     result = await db.execute(stmt)
-    latest = result.scalar_one_or_none()
+    invoice_nos = result.scalars().all()
     
-    if latest:
-        # Extract the sequence number
+    max_seq = 0
+    for num in invoice_nos:
         try:
-            seq = int(latest.split("-")[2])
-            new_seq = seq + 1
+            parts = num.split("-")
+            if len(parts) >= 3:
+                seq = int(parts[2])
+                if seq > max_seq:
+                    max_seq = seq
         except (IndexError, ValueError):
-            new_seq = 1
-    else:
-        new_seq = 1
-        
-    return f"{prefix}{new_seq:05d}"
+            continue
+            
+    new_seq = max_seq + 1
+    
+    # Defensively check candidate invoice numbers to guarantee uniqueness
+    while True:
+        candidate = f"{prefix}{new_seq:05d}"
+        chk = await db.execute(select(Invoice.id).where(Invoice.invoice_no == candidate))
+        if not chk.scalar_one_or_none():
+            return candidate
+        new_seq += 1
 
 
 async def get_invoice_detail(db: AsyncSession, invoice_id: uuid.UUID) -> Invoice:
     stmt = (
         select(Invoice)
         .options(
-            selectinload(Invoice.items).selectinload(InvoiceItem.product),
-            selectinload(Invoice.collections)
+            selectinload(Invoice.items).selectinload(InvoiceItem.product).selectinload(Product.category),
+            selectinload(Invoice.collections),
+            selectinload(Invoice.dealer),
+            selectinload(Invoice.dsr),
+            selectinload(Invoice.shop),
         )
         .where(Invoice.id == invoice_id, Invoice.is_deleted == False)
     )
@@ -93,10 +105,10 @@ async def create_invoice(db: AsyncSession, data: InvoiceCreate, user_id: uuid.UU
         # Calculate quantities
         total_pieces = (item_data.qty_carton * product.pcs_per_carton) + item_data.qty_pcs
         if total_pieces <= 0:
-            raise HTTPException(status_code=422, detail=f"Quantity must be > 0 for product {product.name}")
+            raise HTTPException(status_code=422, detail=f"Quantity must be > 0 for product {product.name_en}")
             
-        unit_price = product.price
-        line_subtotal = unit_price * total_pieces
+        unit_price = Decimal(str(product.sell_price))
+        line_subtotal = unit_price * Decimal(str(total_pieces))
         
         if item_data.is_free_item:
             unit_price = Decimal("0.00")
@@ -189,13 +201,14 @@ async def confirm_invoice(db: AsyncSession, invoice_id: uuid.UUID, user_id: uuid
         raise HTTPException(status_code=400, detail=f"Cannot confirm invoice in {invoice.status} status")
         
     # Check stock
-    from app.services.inventory_service import get_product_stock
+    from app.services.inventory_service import get_stock_level
     
     shortages = []
     for item in invoice.items:
-        current_stock = await get_product_stock(db, item.product_id)
+        stock_data = await get_stock_level(db, item.product)
+        current_stock = stock_data["qty_pieces"]
         if current_stock < item.total_pieces:
-            shortages.append(f"{item.product.name} (Need: {item.total_pieces}, Have: {current_stock})")
+            shortages.append(f"{item.product.name_en} (Need: {item.total_pieces}, Have: {current_stock})")
             
     if shortages:
         raise HTTPException(status_code=422, detail=f"Insufficient stock: {', '.join(shortages)}")
@@ -205,11 +218,12 @@ async def confirm_invoice(db: AsyncSession, invoice_id: uuid.UUID, user_id: uuid
         movement = StockMovement(
             product_id=item.product_id,
             movement_type=MovementType.SALE,
-            quantity=-item.total_pieces,
-            reference_id=str(invoice.id),
+            qty_pieces=item.total_pieces,
+            reference_id=invoice.id,
             reference_type="INVOICE",
             movement_date=invoice.date,
             unit_price=item.unit_price,
+            is_approved=True,
             notes=f"Invoice {invoice.invoice_no}",
             created_by=user_id,
         )
@@ -249,6 +263,7 @@ async def collect_payment(db: AsyncSession, invoice_id: uuid.UUID, data: Collect
         payment_method=data.payment_method,
         reference_no=data.reference_no,
         notes=data.notes,
+        account_id=data.account_id,
         created_by=user_id,
     )
     db.add(collection)
@@ -264,11 +279,11 @@ async def collect_payment(db: AsyncSession, invoice_id: uuid.UUID, data: Collect
     await db.refresh(invoice)
     
     # Send SMS Receipt via Celery
-    inv_result = await db.execute(select(Invoice).options(selectinload(Invoice.shop)).where(Invoice.id == invoice_id))
+    inv_result = await db.execute(select(Invoice).options(selectinload(Invoice.dealer)).where(Invoice.id == invoice_id))
     inv = inv_result.scalar_one_or_none()
-    if inv and inv.shop and inv.shop.phone:
-        message = f"Dear {inv.shop.name}, we have received {float(data.amount)} BDT against Invoice {inv.invoice_no}. Thank you."
-        await send_sms_notification(db, inv.shop.phone, message)
+    if inv and inv.dealer and getattr(inv.dealer, 'phone', None):
+        message = f"Dear {inv.dealer.name}, we have received {float(data.amount)} BDT against Invoice {inv.invoice_no}. Thank you."
+        await send_sms_notification(db, inv.dealer.phone, message)
 
     return await get_invoice_detail(db, invoice_id)
 
@@ -291,7 +306,7 @@ async def void_invoice(db: AsyncSession, invoice_id: uuid.UUID, user_id: uuid.UU
             movement = StockMovement(
                 product_id=item.product_id,
                 movement_type=MovementType.ADJUSTMENT_IN,
-                quantity=item.total_pieces,
+                qty_pieces=item.total_pieces,
                 reference_id=str(invoice.id),
                 reference_type="INVOICE_VOID",
                 movement_date=datetime.utcnow().date(),
@@ -333,10 +348,16 @@ async def list_invoices(
     total = await db.scalar(count_stmt) or 0
     
     # Paginate
-    query = query.order_by(desc(Invoice.date), desc(Invoice.created_at)).offset((page - 1) * per_page).limit(per_page)
+    query = (
+        query.options(
+            selectinload(Invoice.dealer),
+            selectinload(Invoice.dsr).selectinload(DSR.route)
+        )
+        .order_by(desc(Invoice.date), desc(Invoice.created_at))
+        .offset((page - 1) * per_page)
+        .limit(per_page)
+    )
     
-    # Load relationships (dealer, dsr) if needed for list
-    # Actually just the basic info is fine
     result = await db.execute(query)
     items = result.scalars().all()
     
@@ -349,3 +370,83 @@ async def list_invoices(
         "per_page": per_page,
         "pages": pages,
     }
+
+
+async def update_invoice(db: AsyncSession, invoice_id: uuid.UUID, data: InvoiceCreate, user_id: uuid.UUID) -> Invoice:
+    invoice = await get_invoice_detail(db, invoice_id)
+    
+    if invoice.status != InvoiceStatus.DRAFT:
+        raise HTTPException(status_code=400, detail="Only DRAFT invoices can be updated/adjusted")
+        
+    # Collect product IDs to fetch them all at once
+    product_ids = [item.product_id for item in data.items]
+    stmt = select(Product).where(Product.id.in_(product_ids), Product.is_active == True)
+    result = await db.execute(stmt)
+    products = {p.id: p for p in result.scalars().all()}
+    
+    # Check if any products are missing or inactive
+    missing = set(product_ids) - set(products.keys())
+    if missing:
+        raise HTTPException(status_code=422, detail=f"Products not found or inactive: {missing}")
+        
+    # Clear old items
+    invoice.items.clear()
+    
+    subtotal = Decimal("0.00")
+    vat_total = Decimal("0.00")
+    
+    for item_data in data.items:
+        product = products[item_data.product_id]
+        
+        # Calculate quantities
+        total_pieces = (item_data.qty_carton * product.pcs_per_carton) + item_data.qty_pcs
+        if total_pieces <= 0:
+            raise HTTPException(status_code=422, detail=f"Quantity must be > 0 for product {product.name_en}")
+            
+        unit_price = Decimal(str(product.sell_price))
+        line_subtotal = unit_price * Decimal(str(total_pieces))
+        
+        if item_data.is_free_item:
+            unit_price = Decimal("0.00")
+            line_subtotal = Decimal("0.00")
+            vat_amount = Decimal("0.00")
+            vat_rate = Decimal("0.00")
+        else:
+            vat_rate = product.vat_rate if product.vat_applicable else Decimal("0.00")
+            vat_amount = line_subtotal * (vat_rate / Decimal("100"))
+            
+        line_total = line_subtotal + vat_amount
+        
+        subtotal += line_subtotal
+        vat_total += vat_amount
+        
+        invoice.items.append(
+            InvoiceItem(
+                product_id=product.id,
+                qty_carton=item_data.qty_carton,
+                qty_pcs=item_data.qty_pcs,
+                total_pieces=total_pieces,
+                unit_price=unit_price,
+                vat_rate=vat_rate,
+                vat_amount=vat_amount,
+                discount=Decimal("0.00"),
+                line_total=line_total,
+                is_free_item=item_data.is_free_item,
+            )
+        )
+        
+    grand_total = subtotal - data.discount + vat_total
+    
+    invoice.dealer_id = data.dealer_id
+    invoice.dsr_id = data.dsr_id
+    invoice.shop_id = data.shop_id
+    invoice.date = data.date
+    invoice.subtotal = subtotal
+    invoice.vat_amount = vat_total
+    invoice.discount = data.discount
+    invoice.grand_total = grand_total
+    invoice.notes = data.notes
+    
+    await db.commit()
+    await db.refresh(invoice)
+    return await get_invoice_detail(db, invoice.id)

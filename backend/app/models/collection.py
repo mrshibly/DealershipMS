@@ -46,6 +46,10 @@ class Collection(Base):
         UUID(as_uuid=True), ForeignKey("dsrs.id", ondelete="RESTRICT"), nullable=True,
         index=True,
     )
+    account_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("accounts.id", ondelete="RESTRICT"), nullable=True,
+        index=True,
+    )
     
     amount: Mapped[Decimal] = mapped_column(Numeric(15, 2), nullable=False)
     
@@ -76,6 +80,7 @@ class Collection(Base):
     invoice: Mapped["Invoice"] = relationship("Invoice", back_populates="collections")  # noqa: F821
     dealer: Mapped["Dealer"] = relationship("Dealer")  # noqa: F821
     dsr: Mapped["DSR"] = relationship("DSR")  # noqa: F821
+    account: Mapped["Account"] = relationship("Account")  # noqa: F821
 
     def __repr__(self) -> str:
         return f"<Collection amount={self.amount} method={self.payment_method}>"

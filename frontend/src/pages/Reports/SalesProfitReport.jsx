@@ -23,8 +23,18 @@ export default function SalesProfitReport() {
     },
   });
 
-  const handleExport = () => {
-    window.open(`${import.meta.env.VITE_API_URL}/api/v1/reports/${reportType}?date_from=${dateFrom}&date_to=${dateTo}&export=true`, '_blank');
+  const handleExport = async () => {
+    try {
+      const res = await api.get(`/reports/${reportType}?date_from=${dateFrom}&date_to=${dateTo}&export=true`, { responseType: 'blob' });
+      const url = window.URL.createObjectURL(new Blob([res.data]));
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${reportType}-${dateFrom}-to-${dateTo}.xlsx`;
+      a.click();
+      window.URL.revokeObjectURL(url);
+    } catch (e) {
+      alert('Failed to export excel');
+    }
   };
 
   const getColumns = () => {

@@ -19,6 +19,9 @@
     "dashboard": "لوحة التحكم",
     "products": "المنتجات",
     "inventory": "المخزون",
+    "users": "المستخدمين",
+    "targets": "الأهداف",
+    "returns": "المرتجعات",
     "suppliers": "الموردون",
     "purchases": "المشتريات",
     "dealers": "الموزعون",
@@ -52,7 +55,10 @@
     "amount": "المبلغ",
     "no_data": "لا توجد بيانات",
     "per_page": "لكل صفحة",
-    "page": "صفحة"
+    "page": "صفحة",
+    "delete_confirm": "هل أنت متأكد أنك تريد حذف هذا العنصر؟",
+    "delete_success": "تم حذف العنصر بنجاح",
+    "save_success": "تم الحفظ بنجاح"
   },
   "dashboard": {
     "title": "لوحة التحكم",

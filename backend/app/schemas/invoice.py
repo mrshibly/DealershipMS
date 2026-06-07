@@ -10,6 +10,10 @@ from pydantic import BaseModel, Field, ConfigDict
 
 from app.models.invoice import InvoiceStatus
 from app.schemas.collection import CollectionRead
+from app.schemas.product import ProductRead
+from app.schemas.dealer import DealerRead
+from app.schemas.dsr import DSRRead
+from app.schemas.shop import ShopRead
 
 
 class InvoiceItemBase(BaseModel):
@@ -33,6 +37,7 @@ class InvoiceItemRead(InvoiceItemBase):
     vat_amount: Decimal
     discount: Decimal
     line_total: Decimal
+    product: Optional[ProductRead] = None
 
 
 class InvoiceBase(BaseModel):
@@ -65,8 +70,14 @@ class InvoiceRead(InvoiceBase):
     status: InvoiceStatus
     is_deleted: bool
     created_at: datetime
+    dealer_name: Optional[str] = None
+    dsr_name: Optional[str] = None
+    route_name: Optional[str] = None
 
 
 class InvoiceDetailRead(InvoiceRead):
     items: list[InvoiceItemRead]
     collections: list[CollectionRead]
+    dealer: Optional[DealerRead] = None
+    dsr: Optional[DSRRead] = None
+    shop: Optional[ShopRead] = None

@@ -1,11 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useTranslation } from 'react-i18next';
-import { Plus, Trash2, Save, Check } from 'lucide-react';
+import { Plus, Trash2, Save } from 'lucide-react';
 import api from '../../utils/api';
 import { formatCurrency } from '../../utils/formatters';
 
@@ -30,16 +30,22 @@ const schema = z.object({
 });
 
 export default function InvoiceForm() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
+  const { id } = useParams();
+  const isEdit = !!id;
   const [error, setError] = useState('');
+
+  // Filters for product lookup
+  const [selectedBrand, setSelectedBrand] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('');
 
   // Fetch lookups
   const { data: dealers } = useQuery({ queryKey: ['dealers'], queryFn: () => api.get('/dealers?per_page=100').then(res => res.data.data) });
   const { data: dsrs } = useQuery({ queryKey: ['dsrs'], queryFn: () => api.get('/dsrs?per_page=100').then(res => res.data.data) });
   const { data: products } = useQuery({ queryKey: ['products'], queryFn: () => api.get('/products?per_page=500').then(res => res.data.data) });
-
-  const { register, control, handleSubmit, watch, setValue, formState: { errors } } = useForm({
+  
+  const { register, control, handleSubmit, watch, setValue, reset, formState: { errors } } = useForm({
     resolver: zodResolver(schema),
     defaultValues: {
       date: new Date().toISOString().split('T')[0],
@@ -50,15 +56,55 @@ export default function InvoiceForm() {
 
   const { fields, append, remove } = useFieldArray({ control, name: 'items' });
 
-  const watchItems = watch('items');
+  // Fetch invoice details if editing
+  const { data: invoiceData, isLoading: isInvoiceLoading } = useQuery({
+    queryKey: ['invoice', id],
+    queryFn: () => api.get(`/invoices/${id}`).then(res => res.data.data),
+    enabled: isEdit,
+  });
+
+  // Reset form when invoice data loads
+  useEffect(() => {
+    if (isEdit && invoiceData) {
+      reset({
+        dealer_id: invoiceData.dealer_id || '',
+        dsr_id: invoiceData.dsr_id || '',
+        date: invoiceData.date || '',
+        discount: Number(invoiceData.discount) || 0,
+        notes: invoiceData.notes || '',
+        items: invoiceData.items.map(item => ({
+          product_id: item.product_id,
+          qty_carton: item.qty_carton,
+          qty_pcs: item.qty_pcs,
+          is_free_item: item.is_free_item,
+          price: Number(item.unit_price) || 0,
+          vat_rate: Number(item.vat_rate) || 0,
+          pcs_per_carton: item.product?.pcs_per_carton || 1,
+        })),
+      });
+    }
+  }, [isEdit, invoiceData, reset]);
+
+  const watchItems = watch('items') || [];
   const watchDiscount = watch('discount') || 0;
+
+  // Extract unique brands and categories for filtering
+  const uniqueBrands = Array.from(new Set(products?.map(p => p.brand).filter(Boolean) || []));
+  const uniqueCategories = Array.from(new Set(products?.map(p => p.category_name).filter(Boolean) || []));
+
+  // Filter products based on selected brand/category
+  const filteredProducts = products?.filter(p => {
+    if (selectedBrand && p.brand !== selectedBrand) return false;
+    if (selectedCategory && p.category_name !== selectedCategory) return false;
+    return true;
+  }) || [];
 
   // Live calculations
   let subtotal = 0;
   let vatTotal = 0;
 
   watchItems.forEach((item) => {
-    if (!item.product_id) return;
+    if (!item?.product_id) return;
     const totalPcs = (Number(item.qty_carton) * Number(item.pcs_per_carton)) + Number(item.qty_pcs);
     const lineSub = item.is_free_item ? 0 : totalPcs * Number(item.price);
     const lineVat = item.is_free_item ? 0 : lineSub * (Number(item.vat_rate) / 100);
@@ -66,12 +112,12 @@ export default function InvoiceForm() {
     vatTotal += lineVat;
   });
 
-  const grandTotal = subtotal - Number(watchDiscount) + vatTotal;
+  const grandTotal = Math.max(0, subtotal - Number(watchDiscount) + vatTotal);
 
   const handleProductChange = (index, productId) => {
     const product = products?.find(p => p.id === productId);
     if (product) {
-      setValue(`items.${index}.price`, product.price);
+      setValue(`items.${index}.price`, product.price || product.sell_price);
       setValue(`items.${index}.vat_rate`, product.vat_applicable ? product.vat_rate : 0);
       setValue(`items.${index}.pcs_per_carton`, product.pcs_per_carton);
     } else {
@@ -83,6 +129,16 @@ export default function InvoiceForm() {
 
   const createMutation = useMutation({
     mutationFn: (data) => api.post('/invoices', data),
+    onSuccess: (res) => {
+      navigate(`/invoices/${res.data.data.id}`);
+    },
+    onError: (err) => {
+      setError(err.response?.data?.detail || t('common.error'));
+    },
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: (data) => api.put(`/invoices/${id}`, data),
     onSuccess: (res) => {
       navigate(`/invoices/${res.data.data.id}`);
     },
@@ -113,13 +169,33 @@ export default function InvoiceForm() {
         is_free_item: i.is_free_item,
       })),
     };
-    createMutation.mutate(payload);
+
+    if (isEdit) {
+      updateMutation.mutate(payload);
+    } else {
+      createMutation.mutate(payload);
+    }
   };
+
+  const isPending = createMutation.isPending || updateMutation.isPending || isInvoiceLoading;
+
+  if (isEdit && isInvoiceLoading) {
+    return <div className="text-center py-12">{t('common.loading', 'Loading...')}</div>;
+  }
 
   return (
     <div className="max-w-5xl mx-auto pb-12">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-text">{t('invoices.create')}</h1>
+      <div className="mb-6 flex justify-between items-center">
+        <div>
+          <h1 className="text-2xl font-bold text-text">
+            {isEdit ? t('invoices.adjust_invoice', 'Adjust Invoice') : t('invoices.create')}
+          </h1>
+          {isEdit && invoiceData && (
+            <p className="text-text-muted text-sm mt-1">
+              {t('invoices.editing_invoice', 'Editing Invoice')}: <span className="font-semibold text-primary">{invoiceData.invoice_no}</span>
+            </p>
+          )}
+        </div>
       </div>
 
       {error && (
@@ -129,7 +205,8 @@ export default function InvoiceForm() {
       )}
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-        <div className="card grid grid-cols-1 md:grid-cols-3 gap-6">
+        {/* Dealer, DSR & Date info */}
+        <div className="card grid grid-cols-1 md:grid-cols-3 gap-6 shadow-sm">
           <div>
             <label className="label">{t('invoices.dealer')}</label>
             <select className="input" {...register('dealer_id')}>
@@ -158,7 +235,46 @@ export default function InvoiceForm() {
           </div>
         </div>
 
-        <div className="card p-0 overflow-hidden">
+        {/* Brand & Category Product Filter */}
+        <div className="card shadow-sm bg-background/50">
+          <h3 className="font-semibold text-sm text-text-muted uppercase tracking-wider mb-3">
+            {t('product.filter_lookup', 'Product Dropdown Filters')}
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="label">{t('product.brand', 'Brand')}</label>
+              <select
+                className="input"
+                value={selectedBrand}
+                onChange={(e) => setSelectedBrand(e.target.value)}
+              >
+                <option value="">{t('common.all', 'All Brands')}</option>
+                {uniqueBrands.map(b => (
+                  <option key={b} value={b}>{b}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="label">{t('product.category', 'Category')}</label>
+              <select
+                className="input"
+                value={selectedCategory}
+                onChange={(e) => setSelectedCategory(e.target.value)}
+              >
+                <option value="">{t('common.all', 'All Categories')}</option>
+                {uniqueCategories.map(c => (
+                  <option key={c} value={c}>{c}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+          <p className="text-xs text-text-muted mt-2">
+            * {t('product.filter_hint', 'Filtering here will narrow down the product selections in the table below to make lookup faster.')}
+          </p>
+        </div>
+
+        {/* Invoice Items */}
+        <div className="card p-0 overflow-hidden shadow-sm">
           <div className="p-4 border-b border-border bg-background/50 flex justify-between items-center">
             <h2 className="font-semibold text-text">{t('invoices.items')}</h2>
             <button
@@ -175,29 +291,36 @@ export default function InvoiceForm() {
             <table className="w-full text-sm text-left">
               <thead className="bg-background text-text-muted">
                 <tr>
-                  <th className="px-4 py-3">{t('products.product')}</th>
-                  <th className="px-4 py-3 w-24">{t('products.carton')}</th>
-                  <th className="px-4 py-3 w-24">{t('products.pcs')}</th>
+                  <th className="px-4 py-3">{t('product.name')}</th>
+                  <th className="px-4 py-3 w-24">{t('product.ctn')}</th>
+                  <th className="px-4 py-3 w-24">{t('product.pcs')}</th>
                   <th className="px-4 py-3 w-20 text-center">{t('invoices.free')}</th>
-                  <th className="px-4 py-3 text-right">{t('products.price')}</th>
-                  <th className="px-4 py-3 text-right">{t('products.vat')}</th>
+                  <th className="px-4 py-3 text-right">{t('product.sell_price')}</th>
+                  <th className="px-4 py-3 text-right">{t('product.vat_rate')}</th>
                   <th className="px-4 py-3 text-right">{t('invoices.line_total')}</th>
                   <th className="px-4 py-3 w-12"></th>
                 </tr>
               </thead>
               <tbody>
                 {fields.map((field, index) => {
-                  const item = watchItems[index];
-                  const totalPcs = (Number(item.qty_carton) * Number(item.pcs_per_carton)) + Number(item.qty_pcs);
-                  const lineSub = item.is_free_item ? 0 : totalPcs * Number(item.price);
-                  const lineVat = item.is_free_item ? 0 : lineSub * (Number(item.vat_rate) / 100);
+                  const item = watchItems[index] || {};
+                  const totalPcs = (Number(item.qty_carton || 0) * Number(item.pcs_per_carton || 1)) + Number(item.qty_pcs || 0);
+                  const lineSub = item.is_free_item ? 0 : totalPcs * Number(item.price || 0);
+                  const lineVat = item.is_free_item ? 0 : lineSub * (Number(item.vat_rate || 0) / 100);
                   const lineTotal = lineSub + lineVat;
 
+                  // Find currently selected product so we can show it even if filtered out
+                  const currentProduct = products?.find(p => p.id === item.product_id);
+                  const optionsList = [...filteredProducts];
+                  if (currentProduct && !optionsList.find(p => p.id === currentProduct.id)) {
+                    optionsList.push(currentProduct);
+                  }
+
                   return (
-                    <tr key={field.id} className="border-b border-border last:border-0">
+                    <tr key={field.id} className="border-b border-border last:border-0 hover:bg-background/20 transition-colors">
                       <td className="px-4 py-3">
                         <select
-                          className="input"
+                          className="input min-w-[200px]"
                           {...register(`items.${index}.product_id`)}
                           onChange={(e) => {
                             register(`items.${index}.product_id`).onChange(e);
@@ -205,8 +328,10 @@ export default function InvoiceForm() {
                           }}
                         >
                           <option value="">{t('common.select')}</option>
-                          {products?.map(p => (
-                            <option key={p.id} value={p.id}>{p.name} ({p.pcs_per_carton} pcs/ctn)</option>
+                          {optionsList?.map(p => (
+                            <option key={p.id} value={p.id}>
+                              {i18n.language === 'bn' && p.name_bn ? p.name_bn : p.name_en} ({p.pcs_per_carton} pcs/ctn)
+                            </option>
                           ))}
                         </select>
                         {errors.items?.[index]?.product_id && <p className="text-danger text-xs mt-1">{errors.items[index].product_id.message}</p>}
@@ -218,20 +343,20 @@ export default function InvoiceForm() {
                         <input type="number" min="0" className="input text-center" {...register(`items.${index}.qty_pcs`)} />
                       </td>
                       <td className="px-4 py-3 text-center">
-                        <input type="checkbox" className="w-4 h-4 text-primary rounded border-border" {...register(`items.${index}.is_free_item`)} />
+                        <input type="checkbox" className="w-4 h-4 text-primary rounded border-border cursor-pointer" {...register(`items.${index}.is_free_item`)} />
                       </td>
-                      <td className="px-4 py-3 text-right text-text-muted">
-                        {formatCurrency(item.price)}
+                      <td className="px-4 py-3 text-right text-text-muted font-mono">
+                        {formatCurrency(item.price || 0)}
                       </td>
-                      <td className="px-4 py-3 text-right text-text-muted">
-                        {item.vat_rate}%
+                      <td className="px-4 py-3 text-right text-text-muted font-mono">
+                        {item.vat_rate || 0}%
                       </td>
-                      <td className="px-4 py-3 text-right font-medium">
+                      <td className="px-4 py-3 text-right font-medium font-mono text-text">
                         {formatCurrency(lineTotal)}
                       </td>
                       <td className="px-4 py-3">
                         {fields.length > 1 && (
-                          <button type="button" className="text-danger hover:bg-danger/10 p-1 rounded" onClick={() => remove(index)}>
+                          <button type="button" className="text-danger hover:bg-danger/10 p-1.5 rounded transition-colors" onClick={() => remove(index)}>
                             <Trash2 className="w-4 h-4" />
                           </button>
                         )}
@@ -244,43 +369,45 @@ export default function InvoiceForm() {
           </div>
         </div>
 
-        <div className="card">
-          <div className="flex flex-col md:flex-row justify-between gap-8">
-            <div className="flex-1">
+        {/* Notes & Calculations */}
+        <div className="card shadow-sm">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="md:col-span-2">
               <label className="label">{t('invoices.notes')}</label>
-              <textarea className="input" rows="3" {...register('notes')} placeholder={t('common.optional')}></textarea>
+              <textarea className="input" rows="4" {...register('notes')} placeholder={t('common.optional')}></textarea>
             </div>
             
-            <div className="w-full md:w-80 space-y-3 bg-background/50 p-4 rounded-lg border border-border">
+            <div className="space-y-3 bg-background/50 p-4 rounded-lg border border-border">
               <div className="flex justify-between text-sm">
                 <span className="text-text-muted">{t('invoices.subtotal')}</span>
-                <span className="font-medium">{formatCurrency(subtotal)}</span>
+                <span className="font-medium font-mono">{formatCurrency(subtotal)}</span>
               </div>
               <div className="flex justify-between items-center text-sm">
                 <span className="text-text-muted">{t('invoices.discount')}</span>
-                <input type="number" step="0.01" min="0" className="input w-24 text-right h-8" {...register('discount')} />
+                <input type="number" step="0.01" min="0" className="input w-24 text-right h-8 font-mono" {...register('discount')} />
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-text-muted">{t('invoices.vat')}</span>
-                <span className="font-medium">{formatCurrency(vatTotal)}</span>
+                <span className="font-medium font-mono">{formatCurrency(vatTotal)}</span>
               </div>
-              <div className="border-t border-border pt-3 mt-3 flex justify-between">
+              <div className="border-t border-border pt-3 mt-3 flex justify-between items-center">
                 <span className="font-bold text-text">{t('invoices.grand_total')}</span>
-                <span className="font-bold text-primary text-lg">{formatCurrency(grandTotal)}</span>
+                <span className="font-bold text-primary text-xl font-mono">{formatCurrency(grandTotal)}</span>
               </div>
             </div>
           </div>
         </div>
 
+        {/* Form Actions */}
         <div className="flex justify-end gap-4">
-          <button type="button" className="btn-secondary" onClick={() => navigate(-1)} disabled={createMutation.isPending}>
+          <button type="button" className="btn-secondary" onClick={() => navigate(-1)} disabled={isPending}>
             {t('common.cancel')}
           </button>
-          <button type="submit" className="btn-primary" disabled={createMutation.isPending}>
-            {createMutation.isPending ? t('common.loading') : (
+          <button type="submit" className="btn-primary" disabled={isPending}>
+            {isPending ? t('common.loading') : (
               <>
                 <Save className="w-4 h-4 mr-2" />
-                {t('invoices.save_draft')}
+                {isEdit ? t('invoices.save_changes', 'Save Adjustments') : t('invoices.save_draft')}
               </>
             )}
           </button>

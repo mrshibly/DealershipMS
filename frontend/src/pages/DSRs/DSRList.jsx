@@ -29,7 +29,13 @@ export default function DSRList() {
 
   const deleteMutation = useMutation({
     mutationFn: (id) => api.delete(`/dsrs/${id}`),
-    onSuccess: () => qc.invalidateQueries(['dsrs']),
+    onSuccess: () => {
+      qc.invalidateQueries(['dsrs']);
+      window.dispatchEvent(new CustomEvent('dms:toast', { detail: { message: t('common.delete_success'), type: 'success' } }));
+    },
+    onError: (err) => {
+      window.dispatchEvent(new CustomEvent('dms:toast', { detail: { message: err.response?.data?.detail || t('common.error'), type: 'danger' } }));
+    }
   });
 
   const dsrs = data?.data || [];
@@ -67,7 +73,7 @@ export default function DSRList() {
             <Edit className="w-4 h-4" />
           </button>
           <button
-            onClick={() => { if (confirm(t('dsr.confirm_delete'))) deleteMutation.mutate(id); }}
+            onClick={() => { if (window.confirm(t('common.delete_confirm'))) deleteMutation.mutate(id); }}
             className="p-1.5 rounded hover:bg-danger-light text-text-muted hover:text-danger"
           >
             <Trash2 className="w-4 h-4" />

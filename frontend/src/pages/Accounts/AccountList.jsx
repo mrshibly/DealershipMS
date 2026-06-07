@@ -23,7 +23,13 @@ export default function AccountList() {
 
   const deleteMutation = useMutation({
     mutationFn: (id) => api.delete(`/accounts/${id}`),
-    onSuccess: () => qc.invalidateQueries(['accounts']),
+    onSuccess: () => {
+      qc.invalidateQueries(['accounts']);
+      window.dispatchEvent(new CustomEvent('dms:toast', { detail: { message: t('common.delete_success'), type: 'success' } }));
+    },
+    onError: (err) => {
+      window.dispatchEvent(new CustomEvent('dms:toast', { detail: { message: err.response?.data?.detail || t('common.error'), type: 'danger' } }));
+    }
   });
 
   const accounts = response?.data || [];
@@ -62,7 +68,7 @@ export default function AccountList() {
             <Edit className="w-4 h-4" />
           </button>
           <button
-            onClick={() => { if (confirm(t('common.confirm'))) deleteMutation.mutate(id); }}
+            onClick={() => { if (window.confirm(t('common.delete_confirm'))) deleteMutation.mutate(id); }}
             className="p-1.5 rounded hover:bg-danger-light text-text-muted hover:text-danger"
           >
             <Trash2 className="w-4 h-4" />

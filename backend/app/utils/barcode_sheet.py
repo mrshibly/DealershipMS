@@ -101,7 +101,7 @@ def generate_barcode_sheet_pdf(
         except Exception:
             rl_img = Paragraph("(barcode error)", sku_style)
 
-        price_str = f"৳{item.get('price', '0.00')}" if item.get("price") else ""
+        price_str = f"Tk. {item.get('price', '0.00')}" if item.get("price") else ""
         cell_content = Table(
             [
                 [Paragraph(item.get("name", ""), label_style)],

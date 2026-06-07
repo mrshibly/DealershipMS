@@ -13,7 +13,7 @@ import { PageHeader } from '../../components/ui/index.jsx';
 const emptyItem = () => ({ product_id: '', qty_carton: 0, qty_pcs: 0, buy_price: 0 });
 
 export default function PurchaseForm() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const qc = useQueryClient();
 
@@ -165,7 +165,9 @@ export default function PurchaseForm() {
                         >
                           <option value="">{t('purchase.select_product')}</option>
                           {(products || []).map((p) => (
-                            <option key={p.id} value={p.id}>{p.name_en} ({p.sku})</option>
+                            <option key={p.id} value={p.id}>
+                              {i18n.language === 'bn' && p.name_bn ? p.name_bn : p.name_en} ({p.sku})
+                            </option>
                           ))}
                         </select>
                       </td>

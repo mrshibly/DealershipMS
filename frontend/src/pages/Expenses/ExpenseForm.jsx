@@ -40,7 +40,7 @@ export default function ExpenseForm() {
       head_id: '',
       account_id: '',
       amount: 0,
-      date: new Date().toISOString().split('T')[0],
+      date: new Date().toLocaleDateString('en-CA'), // local date YYYY-MM-DD
       description: '',
       reference: '',
     },
@@ -54,12 +54,15 @@ export default function ExpenseForm() {
       navigate('/expenses');
     },
     onError: (err) => {
-        alert(err.response?.data?.detail || "Failed to record expense");
+      alert(err.response?.data?.detail || "Failed to record expense");
     }
   });
 
   const onSubmit = (data) => {
-    mutation.mutate(data);
+    const payload = { ...data };
+    if (!payload.description) payload.description = null;
+    if (!payload.reference) payload.reference = null;
+    mutation.mutate(payload);
   };
 
   return (
@@ -72,53 +75,53 @@ export default function ExpenseForm() {
       <form onSubmit={handleSubmit(onSubmit)} className="card space-y-4">
         
         <div className="grid grid-cols-2 gap-4">
-           <div>
+          <div>
             <label className="label">{t('expenses.head_name')}</label>
-            <select className="input" {...register('head_id')}>
+            <select className={`input ${errors.head_id ? 'input-error' : ''}`} {...register('head_id')}>
               <option value="">{t('common.select')}...</option>
               {heads.map(h => (
-                  <option key={h.id} value={h.id}>{h.name}</option>
+                <option key={h.id} value={h.id}>{h.name}</option>
               ))}
             </select>
-            {errors.head_id && <span className="text-danger text-sm">{errors.head_id.message}</span>}
+            {errors.head_id && <p className="error-msg">{errors.head_id.message}</p>}
           </div>
 
           <div>
             <label className="label">{t('expenses.paid_from')}</label>
-            <select className="input" {...register('account_id')}>
+            <select className={`input ${errors.account_id ? 'input-error' : ''}`} {...register('account_id')}>
               <option value="">{t('common.select')}...</option>
               {accounts.map(a => (
-                  <option key={a.id} value={a.id}>{a.name} ({a.current_balance} ৳)</option>
+                <option key={a.id} value={a.id}>{a.name} ({a.current_balance} ৳)</option>
               ))}
             </select>
-            {errors.account_id && <span className="text-danger text-sm">{errors.account_id.message}</span>}
+            {errors.account_id && <p className="error-msg">{errors.account_id.message}</p>}
           </div>
         </div>
 
         <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="label">{t('common.amount')}</label>
-              <input type="number" step="0.01" className="input" {...register('amount', { valueAsNumber: true })} />
-              {errors.amount && <span className="text-danger text-sm">{errors.amount.message}</span>}
-            </div>
-            
-            <div>
-              <label className="label">{t('common.date')}</label>
-              <input type="date" className="input" {...register('date')} />
-              {errors.date && <span className="text-danger text-sm">{errors.date.message}</span>}
-            </div>
+          <div>
+            <label className="label">{t('common.amount')}</label>
+            <input type="number" step="0.01" className={`input ${errors.amount ? 'input-error' : ''}`} {...register('amount', { valueAsNumber: true })} />
+            {errors.amount && <p className="error-msg">{errors.amount.message}</p>}
+          </div>
+          
+          <div>
+            <label className="label">{t('common.date')}</label>
+            <input type="date" className={`input ${errors.date ? 'input-error' : ''}`} {...register('date')} />
+            {errors.date && <p className="error-msg">{errors.date.message}</p>}
+          </div>
         </div>
         
         <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="label">{t('expenses.reference')} <span className="text-text-muted text-xs">({t('common.optional')})</span></label>
-              <input type="text" className="input" {...register('reference')} placeholder="e.g. Voucher 101" />
-            </div>
-            
-            <div>
-              <label className="label">{t('expenses.description')} <span className="text-text-muted text-xs">({t('common.optional')})</span></label>
-              <input type="text" className="input" {...register('description')} placeholder="e.g. Monthly transport bill" />
-            </div>
+          <div>
+            <label className="label">{t('expenses.reference')} <span className="text-text-muted text-xs">({t('common.optional')})</span></label>
+            <input type="text" className="input" {...register('reference')} placeholder="e.g. Voucher 101" />
+          </div>
+          
+          <div>
+            <label className="label">{t('expenses.description')} <span className="text-text-muted text-xs">({t('common.optional')})</span></label>
+            <input type="text" className="input" {...register('description')} placeholder="e.g. Monthly transport bill" />
+          </div>
         </div>
 
         <div className="flex justify-end gap-3 pt-4 border-t border-border mt-6">

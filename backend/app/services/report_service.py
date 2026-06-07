@@ -11,7 +11,7 @@ from app.models.invoice import Invoice, InvoiceItem, InvoiceStatus
 from app.models.collection import Collection
 from app.models.expense import Expense
 from app.models.purchase import Purchase, PurchaseItem, PurchaseStatus
-from app.models.stock_movement import StockMovement
+from app.models.stock_movement import StockMovement, MovementType
 from app.models.product import Product
 
 async def get_daybook(db: AsyncSession, day: date) -> dict[str, Any]:
@@ -22,8 +22,8 @@ async def get_daybook(db: AsyncSession, day: date) -> dict[str, Any]:
     # 1. Collections (Cash IN)
     collections = await db.execute(
         select(Collection)
-        .options(selectinload(Collection.invoice), selectinload(Collection.account))
-        .where(Collection.date == day, Collection.is_deleted.is_(False))
+        .options(selectinload(Collection.invoice))
+        .where(func.date(Collection.collected_at) == day, Collection.is_deleted.is_(False))
     )
     col_list = collections.scalars().all()
     total_inflow = sum(c.amount for c in col_list)
@@ -65,10 +65,10 @@ async def get_daybook(db: AsyncSession, day: date) -> dict[str, Any]:
         transactions.append({
             "type": "Collection",
             "reference": c.invoice.invoice_no if c.invoice else str(c.id)[:8],
-            "account": c.account.name if c.account else "Unknown",
+            "account": c.payment_method.value if c.payment_method else "Unknown",
             "inflow": float(c.amount),
             "outflow": 0.0,
-            "narration": f"Collection from {c.payment_method}"
+            "narration": f"Collection from {c.payment_method.value if c.payment_method else ''}"
         })
     for e in exp_list:
         transactions.append({
@@ -185,7 +185,7 @@ async def get_profit_report(
         select(
             Product.sku,
             Product.name_en,
-            Product.price.label("base_buy_price"),
+            Product.buy_price.label("base_buy_price"),
             func.sum(InvoiceItem.total_pieces).label("total_sold"),
             func.sum(InvoiceItem.line_total).label("total_revenue")
         )
@@ -196,7 +196,7 @@ async def get_profit_report(
             Invoice.date <= date_to,
             Invoice.is_deleted.is_(False),
             Invoice.status != InvoiceStatus.VOID,
-            InvoiceItem.is_free.is_(False)  # Free items don't generate revenue
+            InvoiceItem.is_free_item.is_(False)  # Free items don't generate revenue
         )
         .group_by(Product.id)
     )
@@ -207,8 +207,7 @@ async def get_profit_report(
     for row in result.all():
         # This is a simplified profit calculation. In a real scenario, we might
         # track the exact buy_price of the batch that was sold (FIFO/LIFO).
-        # We will assume a 20% margin for the sake of the report if buy_price isn't tracked properly.
-        estimated_buy_price = float(row.base_buy_price) * 0.8
+        estimated_buy_price = float(row.base_buy_price)
         revenue = float(row.total_revenue or 0)
         qty = int(row.total_sold or 0)
         
@@ -259,8 +258,7 @@ async def get_stock_movement_report(
 ) -> list[dict[str, Any]]:
     query = select(StockMovement).where(
         StockMovement.product_id == product_id,
-        StockMovement.is_approved.is_(True),
-        StockMovement.is_deleted.is_(False)
+        StockMovement.is_approved.is_(True)
     ).order_by(StockMovement.movement_date.asc(), StockMovement.created_at.asc())
     
     movements = (await db.execute(query)).scalars().all()
@@ -269,7 +267,13 @@ async def get_stock_movement_report(
     running_balance = 0
     for m in movements:
         # Determine sign based on MovementType
-        if m.movement_type.value in ("OPENING", "PURCHASE", "SALES_RETURN", "ADJUSTMENT_IN", "ROUTE_RETURN"):
+        if m.movement_type in (
+            MovementType.OPENING_STOCK,
+            MovementType.PURCHASE,
+            MovementType.SALES_RETURN,
+            MovementType.ADJUSTMENT_IN,
+            MovementType.DSR_RETURN
+        ):
             qty = m.qty_pieces
         else:
             qty = -m.qty_pieces

@@ -5,7 +5,7 @@ import { Printer, Tag, Check, Square, CheckSquare } from 'lucide-react';
 import api from '../../utils/api';
 
 export default function BarcodePrint() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [selectedIds, setSelectedIds] = useState(new Set());
   const [copies, setCopies] = useState(1);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -126,10 +126,10 @@ export default function BarcodePrint() {
             <thead className="bg-background text-text-muted">
               <tr>
                 <th className="px-4 py-3 w-12"></th>
-                <th className="px-4 py-3">{t('products.product')}</th>
-                <th className="px-4 py-3">{t('products.sku')}</th>
-                <th className="px-4 py-3">{t('products.barcode')}</th>
-                <th className="px-4 py-3 text-right">{t('products.price')}</th>
+                <th className="px-4 py-3">{t('product.name')}</th>
+                <th className="px-4 py-3">SKU</th>
+                <th className="px-4 py-3">Barcode</th>
+                <th className="px-4 py-3 text-right">{t('product.sell_price')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
@@ -147,10 +147,12 @@ export default function BarcodePrint() {
                       : <Square className="w-5 h-5 text-text-muted" />
                     }
                   </td>
-                  <td className="px-4 py-3 font-medium text-text">{p.name}</td>
+                  <td className="px-4 py-3 font-medium text-text">
+                    {i18n.language === 'bn' && p.name_bn ? p.name_bn : p.name_en}
+                  </td>
                   <td className="px-4 py-3 text-text-muted font-mono text-xs">{p.sku || '-'}</td>
                   <td className="px-4 py-3 text-text-muted font-mono text-xs">{p.barcode || <span className="text-danger/60 italic">no barcode</span>}</td>
-                  <td className="px-4 py-3 text-right font-medium">৳{Number(p.price || 0).toLocaleString('en-BD', { minimumFractionDigits: 2 })}</td>
+                  <td className="px-4 py-3 text-right font-medium">৳{Number(p.sell_price || 0).toLocaleString('en-BD', { minimumFractionDigits: 2 })}</td>
                 </tr>
               ))}
               {products.length === 0 && (

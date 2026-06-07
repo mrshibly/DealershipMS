@@ -41,7 +41,13 @@ export default function ExpenseList() {
 
   const deleteMutation = useMutation({
     mutationFn: (id) => api.delete(`/expenses/${id}`),
-    onSuccess: () => qc.invalidateQueries(['expenses']),
+    onSuccess: () => {
+      qc.invalidateQueries(['expenses']);
+      window.dispatchEvent(new CustomEvent('dms:toast', { detail: { message: t('common.delete_success'), type: 'success' } }));
+    },
+    onError: (err) => {
+      window.dispatchEvent(new CustomEvent('dms:toast', { detail: { message: err.response?.data?.detail || t('common.error'), type: 'danger' } }));
+    }
   });
 
   const expenses = data?.data || [];
@@ -61,7 +67,7 @@ export default function ExpenseList() {
       render: (id) => (
         <div className="flex gap-1">
           <button
-            onClick={() => { if (confirm(t('common.confirm'))) deleteMutation.mutate(id); }}
+            onClick={() => { if (window.confirm(t('common.delete_confirm'))) deleteMutation.mutate(id); }}
             className="p-1.5 rounded hover:bg-danger-light text-text-muted hover:text-danger"
           >
             <Trash2 className="w-4 h-4" />

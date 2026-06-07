@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, CheckCircle, XCircle, Download, DollarSign, AlertTriangle } from 'lucide-react';
+import { ArrowLeft, CheckCircle, XCircle, Download, DollarSign, AlertTriangle, Edit3 } from 'lucide-react';
 import api from '../../utils/api';
 import { formatCurrency, formatDate } from '../../utils/formatters';
 import Modal from '../../components/ui/Modal';
@@ -15,11 +15,12 @@ const collectionSchema = z.object({
   payment_method: z.string().min(1, 'Required'),
   reference_no: z.string().optional(),
   notes: z.string().optional(),
+  account_id: z.string().optional(),
 });
 
 export default function InvoiceDetail() {
   const { id } = useParams();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   
@@ -29,6 +30,11 @@ export default function InvoiceDetail() {
   const { data: invoice, isLoading } = useQuery({
     queryKey: ['invoice', id],
     queryFn: () => api.get(`/invoices/${id}`).then(res => res.data.data),
+  });
+
+  const { data: accounts } = useQuery({
+    queryKey: ['accounts'],
+    queryFn: () => api.get('/accounts?per_page=100').then(res => res.data.data),
   });
 
   const confirmMutation = useMutation({
@@ -58,6 +64,7 @@ export default function InvoiceDetail() {
     defaultValues: {
       amount: 0,
       payment_method: 'CASH',
+      account_id: '',
     }
   });
 
@@ -65,6 +72,7 @@ export default function InvoiceDetail() {
     mutationFn: (data) => api.post(`/invoices/${id}/collect`, data),
     onSuccess: () => {
       queryClient.invalidateQueries(['invoice', id]);
+      queryClient.invalidateQueries(['accounts']);
       setIsCollectModalOpen(false);
       reset();
     },
@@ -137,14 +145,20 @@ export default function InvoiceDetail() {
           )}
 
           {canConfirm && (
-            <button 
-              className="btn-primary" 
-              onClick={() => confirmMutation.mutate()}
-              disabled={confirmMutation.isPending}
-            >
-              <CheckCircle className="w-4 h-4 mr-2" />
-              {confirmMutation.isPending ? t('common.loading') : t('invoices.confirm')}
-            </button>
+            <>
+              <Link to={`/invoices/${id}/edit`} className="btn-secondary">
+                <Edit3 className="w-4 h-4 mr-2" />
+                {t('common.edit', 'Adjust')}
+              </Link>
+              <button 
+                className="btn-primary" 
+                onClick={() => confirmMutation.mutate()}
+                disabled={confirmMutation.isPending}
+              >
+                <CheckCircle className="w-4 h-4 mr-2" />
+                {confirmMutation.isPending ? t('common.loading') : t('invoices.confirm')}
+              </button>
+            </>
           )}
 
           {canCollect && (
@@ -206,10 +220,10 @@ export default function InvoiceDetail() {
           <table className="w-full text-sm text-left">
             <thead className="bg-background text-text-muted">
               <tr>
-                <th className="px-6 py-4">{t('products.product')}</th>
-                <th className="px-6 py-4 text-center">{t('products.qty')} (Pcs)</th>
-                <th className="px-6 py-4 text-right">{t('products.price')}</th>
-                <th className="px-6 py-4 text-right">{t('products.vat')}</th>
+                <th className="px-6 py-4">{t('product.name')}</th>
+                <th className="px-6 py-4 text-center">{t('product.pcs')}</th>
+                <th className="px-6 py-4 text-right">{t('product.sell_price')}</th>
+                <th className="px-6 py-4 text-right">{t('product.vat_rate')}</th>
                 <th className="px-6 py-4 text-right">{t('invoices.line_total')}</th>
               </tr>
             </thead>
@@ -217,7 +231,9 @@ export default function InvoiceDetail() {
               {invoice.items.map((item) => (
                 <tr key={item.id}>
                   <td className="px-6 py-4">
-                    <p className="font-medium text-text">{item.product?.name}</p>
+                    <p className="font-medium text-text">
+                      {i18n.language === 'bn' && item.product?.name_bn ? item.product?.name_bn : item.product?.name_en || item.product?.name}
+                    </p>
                     {item.is_free_item && <span className="badge badge-success mt-1">{t('invoices.free_item')}</span>}
                   </td>
                   <td className="px-6 py-4 text-center font-medium">{item.total_pieces}</td>
@@ -301,6 +317,18 @@ export default function InvoiceDetail() {
               <option value="BANK_TRANSFER">Bank Transfer</option>
               <option value="CHEQUE">Cheque</option>
             </select>
+          </div>
+          <div>
+            <label className="label">{t('accounts.account', 'Deposit Account')}</label>
+            <select className="input" {...register('account_id')}>
+              <option value="">{t('common.select', 'Select Account')}</option>
+              {accounts?.map(acc => (
+                <option key={acc.id} value={acc.id}>
+                  {acc.name} ({acc.account_type} - {formatCurrency(acc.balance)})
+                </option>
+              ))}
+            </select>
+            {errors.account_id && <p className="text-danger text-xs mt-1">{errors.account_id.message}</p>}
           </div>
           <div>
             <label className="label">{t('invoices.reference')} ({t('common.optional')})</label>

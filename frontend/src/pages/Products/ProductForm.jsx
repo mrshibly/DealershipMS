@@ -17,6 +17,7 @@ import Spinner from '../../components/ui/index.jsx';
 const schema = z.object({
   name_en: z.string().min(1, 'English name is required'),
   name_bn: z.string().optional(),
+  brand: z.string().optional(),
   sku: z.string().optional(),
   category_id: z.string().optional(),
   unit: z.enum(['piece', 'kg', 'litre', 'set', 'box', 'pack']),
@@ -120,6 +121,10 @@ export default function ProductForm() {
 
             <Field name="sku" label={`SKU (${t('product.auto_generated')})`}>
               <input id="sku" className="input" placeholder="Auto-generated if blank" {...register('sku')} />
+            </Field>
+
+            <Field name="brand" label="Brand">
+              <input id="brand" className="input" placeholder="e.g. Pran, Godrej" {...register('brand')} />
             </Field>
 
             <Field name="category_id" label={t('product.category')}>

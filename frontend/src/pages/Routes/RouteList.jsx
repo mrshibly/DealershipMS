@@ -28,7 +28,13 @@ export default function RouteList() {
 
   const deleteMutation = useMutation({
     mutationFn: (id) => api.delete(`/routes/${id}`),
-    onSuccess: () => qc.invalidateQueries(['routes']),
+    onSuccess: () => {
+      qc.invalidateQueries(['routes']);
+      window.dispatchEvent(new CustomEvent('dms:toast', { detail: { message: t('common.delete_success'), type: 'success' } }));
+    },
+    onError: (err) => {
+      window.dispatchEvent(new CustomEvent('dms:toast', { detail: { message: err.response?.data?.detail || t('common.error'), type: 'danger' } }));
+    }
   });
 
   const routesList = data?.data || [];
@@ -53,7 +59,7 @@ export default function RouteList() {
             <Edit className="w-4 h-4" />
           </button>
           <button
-            onClick={() => { if (confirm(t('route.confirm_delete'))) deleteMutation.mutate(id); }}
+            onClick={() => { if (window.confirm(t('common.delete_confirm'))) deleteMutation.mutate(id); }}
             className="p-1.5 rounded hover:bg-danger-light text-text-muted hover:text-danger"
           >
             <Trash2 className="w-4 h-4" />
