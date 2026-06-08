@@ -8,6 +8,8 @@ from app.models.expense import ExpenseHead, Expense
 from app.models.invoice import Invoice, InvoiceItem
 from app.models.product import Product
 from app.models.purchase import Purchase, PurchaseItem
+from app.models.purchase_return import PurchaseReturn, PurchaseReturnItem, PurchaseReturnStatus
+from app.models.supplier_payment import SupplierPayment
 from app.models.role import Role
 from app.models.route import Route
 from app.models.setting import Setting
@@ -33,6 +35,10 @@ __all__ = [
     "Product",
     "Purchase",
     "PurchaseItem",
+    "PurchaseReturn",
+    "PurchaseReturnItem",
+    "PurchaseReturnStatus",
+    "SupplierPayment",
     "Role",
     "Route",
     "Setting",

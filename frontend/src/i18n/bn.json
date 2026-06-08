@@ -40,7 +40,9 @@
     "wholesale_adjust_list": "হোলসেল সমন্বয় তালিকা",
     "bulk_return": "বাল্ক রিটার্ন",
     "due_collection": "বকেয়া সংগ্রহ",
-    "dsr_target": "ডিএসআর টার্গেট"
+    "dsr_target": "ডিএসআর টার্গেট",
+    "purchase_returns": "ক্রয় ফেরত",
+    "supplier_payments": "সরবরাহকারী পরিশোধ"
   },
   "common": {
     "loading": "লোড হচ্ছে...",

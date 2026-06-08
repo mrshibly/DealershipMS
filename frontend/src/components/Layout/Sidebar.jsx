@@ -57,10 +57,12 @@ const NAV_GROUPS = [
   {
     label: 'Inventory',
     items: [
-      { key: 'products',  label: 'nav.products',  icon: Package,      to: '/products' },
-      { key: 'inventory', label: 'nav.inventory', icon: Boxes,        to: '/inventory' },
-      { key: 'suppliers', label: 'nav.suppliers', icon: Truck,        to: '/suppliers' },
-      { key: 'purchases', label: 'nav.purchases', icon: ShoppingCart, to: '/purchases' },
+      { key: 'products',          label: 'nav.products',          icon: Package,      to: '/products' },
+      { key: 'inventory',         label: 'nav.inventory',         icon: Boxes,        to: '/inventory' },
+      { key: 'suppliers',         label: 'nav.suppliers',         icon: Truck,        to: '/suppliers' },
+      { key: 'purchases',         label: 'nav.purchases',         icon: ShoppingCart, to: '/purchases' },
+      { key: 'purchase-returns',  label: 'nav.purchase_returns',  icon: RotateCcw,    to: '/purchases/returns' },
+      { key: 'supplier-payments', label: 'nav.supplier_payments', icon: CreditCard,   to: '/purchases/payments' },
     ],
   },
   {

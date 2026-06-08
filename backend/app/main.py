@@ -3,7 +3,7 @@ FastAPI application entry point.
 """
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, Request, status
+from fastapi import FastAPI, Request, status, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
@@ -57,6 +57,18 @@ app.add_middleware(
 # -------------------------------------------------------------------
 # Global exception handlers — standard response envelope
 # -------------------------------------------------------------------
+@app.exception_handler(HTTPException)
+async def http_exception_handler(request: Request, exc: HTTPException) -> JSONResponse:
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={
+            "success": False,
+            "error": exc.detail,
+            "detail": None,
+        },
+    )
+
+
 @app.exception_handler(Exception)
 async def generic_exception_handler(request: Request, exc: Exception) -> JSONResponse:
     return JSONResponse(
@@ -99,6 +111,8 @@ from app.api.v1.routes import settings as settings_router
 from app.api.v1.routes import targets as targets_router
 from app.api.v1.routes import returns as returns_router
 from app.api.v1.routes import collections as collections_router
+from app.api.v1.routes import supplier_payments as supplier_payments_router
+from app.api.v1.routes import purchase_returns as purchase_returns_router
 
 app.include_router(auth_router.router, prefix="/api/v1")
 app.include_router(categories_router, prefix="/api/v1")
@@ -122,3 +136,5 @@ app.include_router(settings_router.router, prefix="/api/v1")
 app.include_router(targets_router.router, prefix="/api/v1")
 app.include_router(returns_router.router, prefix="/api/v1")
 app.include_router(collections_router.router, prefix="/api/v1")
+app.include_router(supplier_payments_router.router, prefix="/api/v1")
+app.include_router(purchase_returns_router.router, prefix="/api/v1")

@@ -35,6 +35,7 @@ class MovementType(str, enum.Enum):
     ADJUSTMENT_OUT  = "ADJUSTMENT_OUT"  # Manual correction downward
     DSR_ISSUE       = "DSR_ISSUE"       # Stock given to DSR
     DSR_RETURN      = "DSR_RETURN"      # Stock returned from DSR
+    PURCHASE_RETURN = "PURCHASE_RETURN" # Returned to supplier
 
 
 # Movements that ADD to stock
@@ -53,6 +54,7 @@ OUTWARD_TYPES = {
     MovementType.FREE_GIVEN,
     MovementType.ADJUSTMENT_OUT,
     MovementType.DSR_ISSUE,
+    MovementType.PURCHASE_RETURN,
 }
 
 

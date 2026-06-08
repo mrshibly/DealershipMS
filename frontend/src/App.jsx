@@ -19,6 +19,9 @@ import SupplierList from './pages/Suppliers/SupplierList';
 import SupplierForm from './pages/Suppliers/SupplierForm';
 import PurchaseList from './pages/Purchases/PurchaseList';
 import PurchaseForm from './pages/Purchases/PurchaseForm';
+import PurchaseReturnList from './pages/Purchases/PurchaseReturnList';
+import PurchaseReturnForm from './pages/Purchases/PurchaseReturnForm';
+import SupplierPaymentList from './pages/Purchases/SupplierPaymentList';
 
 // Sprint 2 pages
 import RouteList from './pages/Routes/RouteList';
@@ -97,6 +100,9 @@ export default function App() {
               <Route path="/suppliers/:id/edit" element={<SupplierForm />} />
               <Route path="/purchases"        element={<PurchaseList />} />
               <Route path="/purchases/new"    element={<PurchaseForm />} />
+              <Route path="/purchases/returns"      element={<PurchaseReturnList />} />
+              <Route path="/purchases/returns/new"  element={<PurchaseReturnForm />} />
+              <Route path="/purchases/payments"     element={<SupplierPaymentList />} />
 
               {/* Sprint 2 — People & Routes */}
               <Route path="/dealers"          element={<DealerList />} />

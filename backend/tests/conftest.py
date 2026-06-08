@@ -21,13 +21,18 @@ engine = create_async_engine(
 TestingSessionLocal = async_sessionmaker(autocommit=False, autoflush=False, bind=engine, expire_on_commit=False)
 
 
-@pytest.fixture
-async def client() -> AsyncClient:
+@pytest_asyncio.fixture
+async def client(db_session: AsyncSession) -> AsyncClient:
+    from app.core.database import get_db
+    async def override_get_db():
+        yield db_session
+    app.dependency_overrides[get_db] = override_get_db
     async with AsyncClient(
         transport=ASGITransport(app=app),
         base_url="http://test",
     ) as ac:
         yield ac
+    app.dependency_overrides.clear()
 
 @pytest_asyncio.fixture(scope="function")
 async def db_session() -> AsyncSession:
@@ -39,7 +44,7 @@ async def db_session() -> AsyncSession:
         yield session
         await session.rollback()
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def auth_client(client: AsyncClient, db_session: AsyncSession) -> AsyncClient:
     from app.core.database import get_db
     from app.core.security import get_current_user

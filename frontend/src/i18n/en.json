@@ -40,7 +40,9 @@
     "wholesale_adjust_list": "Wholesale Adjust List",
     "bulk_return": "Bulk Return",
     "due_collection": "Due Collection",
-    "dsr_target": "DSR Target"
+    "dsr_target": "DSR Target",
+    "purchase_returns": "Purchase Returns",
+    "supplier_payments": "Supplier Payments"
   },
   "common": {
     "loading": "Loading...",

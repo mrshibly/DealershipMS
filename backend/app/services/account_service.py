@@ -10,6 +10,7 @@ from app.models.account import Account, AccountType
 from app.models.collection import Collection
 from app.models.contra import ContraEntry
 from app.models.expense import Expense
+from app.models.supplier_payment import SupplierPayment
 from app.schemas.account import AccountCreate, AccountUpdate
 
 
@@ -119,6 +120,16 @@ async def compute_balance(db: AsyncSession, account_id: uuid.UUID) -> Decimal:
     )
     expenses_sum = exp_result.scalar() or Decimal("0.00")
     balance -= expenses_sum
+
+    # Supplier Payments (Outflow)
+    supp_payment_result = await db.execute(
+        select(func.sum(SupplierPayment.amount)).where(
+            SupplierPayment.account_id == account_id,
+            SupplierPayment.is_deleted.is_(False)
+        )
+    )
+    supp_payments_sum = supp_payment_result.scalar() or Decimal("0.00")
+    balance -= supp_payments_sum
 
     # Contra Outflow
     contra_out_result = await db.execute(
