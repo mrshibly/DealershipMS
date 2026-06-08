@@ -119,7 +119,9 @@ async def download_invoice_pdf(
 ):
     """Generate and download an NBR-compliant PDF for the invoice"""
     from app.utils.pdf import generate_invoice_pdf
+    from app.core.config import get_settings
     invoice = await invoice_service.get_invoice_detail(db, id)
+    settings = get_settings()
 
     # Build the data dict for the PDF generator
     data = {
@@ -148,11 +150,10 @@ async def download_invoice_pdf(
         "vat_amount": invoice.vat_amount,
         "grand_total": invoice.grand_total,
         "paid_amount": invoice.paid_amount,
-        # Company info – will be replaced with real settings in Sprint 4
-        "company_name": "Dealership Management System",
-        "company_address": "Dhaka, Bangladesh",
-        "company_phone": "+880 1700-000000",
-        "company_vat_bin": "N/A",
+        "company_name": settings.company_name,
+        "company_address": settings.company_address,
+        "company_phone": settings.company_phone,
+        "company_vat_bin": settings.company_vat_bin,
     }
 
     pdf_bytes = generate_invoice_pdf(data)

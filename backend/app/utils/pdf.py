@@ -61,11 +61,11 @@ def generate_invoice_pdf(invoice_data: dict) -> bytes:
     company_vat = invoice_data.get("company_vat_bin", "")
 
     header_style = ParagraphStyle("CompanyName", fontSize=16, fontName="Helvetica-Bold",
-                                   textColor=PRIMARY, alignment=TA_LEFT)
+                                   textColor=PRIMARY, alignment=TA_LEFT, leading=20)
     sub_style = ParagraphStyle("CompanySub", fontSize=8, fontName="Helvetica",
                                textColor=MUTED, alignment=TA_LEFT, leading=12)
     inv_title_style = ParagraphStyle("InvTitle", fontSize=20, fontName="Helvetica-Bold",
-                                      textColor=DARK, alignment=TA_RIGHT)
+                                      textColor=DARK, alignment=TA_RIGHT, leading=24)
     inv_meta_style = ParagraphStyle("InvMeta", fontSize=8, fontName="Helvetica",
                                      textColor=MUTED, alignment=TA_RIGHT, leading=12)
 
@@ -186,13 +186,13 @@ def generate_invoice_pdf(invoice_data: dict) -> bytes:
 
     # ── Totals ──────────────────────────────────────────────────────────────────
     total_label = ParagraphStyle("TotLabel", fontSize=9, fontName="Helvetica",
-                                  textColor=MUTED, alignment=TA_RIGHT)
+                                  textColor=MUTED, alignment=TA_RIGHT, leading=12)
     total_value = ParagraphStyle("TotVal", fontSize=9, fontName="Helvetica",
-                                  textColor=DARK, alignment=TA_RIGHT)
+                                  textColor=DARK, alignment=TA_RIGHT, leading=12)
     grand_label = ParagraphStyle("GrandL", fontSize=11, fontName="Helvetica-Bold",
-                                  textColor=DARK, alignment=TA_RIGHT)
+                                  textColor=DARK, alignment=TA_RIGHT, leading=15)
     grand_value = ParagraphStyle("GrandV", fontSize=11, fontName="Helvetica-Bold",
-                                  textColor=PRIMARY, alignment=TA_RIGHT)
+                                  textColor=PRIMARY, alignment=TA_RIGHT, leading=15)
 
     outstanding = Decimal(str(invoice_data.get("grand_total", 0))) - Decimal(str(invoice_data.get("paid_amount", 0)))
     totals_rows = [
