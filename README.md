@@ -45,9 +45,9 @@ DMS is a comprehensive management platform for multi-route, multi-dealer distrib
 | S0 | Foundation — Auth, RBAC, Docker, DB setup | ✅ Complete |
 | S1 | Products, Inventory, Suppliers, Purchases | ✅ Complete |
 | S2 | Routes, Dealers, Shops, DSRs | ✅ Complete |
-| S3 | Invoices & Collections | 🔜 Planned |
-| S4 | Accounts & Finance | 🔜 Planned |
-| S5 | Reports & Analytics | 🔜 Planned |
+| S3 | Invoices & Collections | ✅ Complete |
+| S4 | Accounts & Finance | ✅ Complete |
+| S5 | Reports & Analytics | ✅ Complete |
 | S6 | Dashboard Charts | 🔜 Planned |
 | S7 | SMS Notifications | 🔜 Planned |
 
@@ -159,6 +159,10 @@ All endpoints are prefixed with `/api/v1`. Full interactive docs at `/api/v1/doc
 | Dealers | `GET/POST /dealers`, `GET/PUT/DELETE /dealers/{id}` |
 | DSRs | `GET/POST /dsrs`, `GET/PUT/DELETE /dsrs/{id}` |
 | Shops | `GET/POST /shops`, `GET/PUT/DELETE /shops/{id}` |
+| Invoices | `GET/POST /invoices`, `GET/PUT /invoices/{id}`, `POST /invoices/{id}/confirm`, `POST /invoices/{id}/void`, `GET /invoices/{id}/pdf` |
+| Collections | `GET/POST /collections` |
+| Returns | `POST /returns` |
+| Accounts | `GET/POST /accounts`, `GET /accounts/{id}/ledger` |
 
 ---
 
@@ -236,3 +240,4 @@ This project is licensed under the MIT License — see the [LICENSE](LICENSE) fi
 ---
 
 <p align="center">Built for Bangladesh 🇧🇩 — with precision, in Bangla.</p>
+<p align="center">This software is built by <a href="https://setuops.xyz">SETU Ops</a>.</p>
