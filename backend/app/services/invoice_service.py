@@ -64,7 +64,7 @@ async def get_invoice_detail(db: AsyncSession, invoice_id: uuid.UUID) -> Invoice
             selectinload(Invoice.items).selectinload(InvoiceItem.product).selectinload(Product.category),
             selectinload(Invoice.collections),
             selectinload(Invoice.dealer),
-            selectinload(Invoice.dsr),
+            selectinload(Invoice.dsr).selectinload(DSR.route),
             selectinload(Invoice.shop),
         )
         .where(Invoice.id == invoice_id, Invoice.is_deleted == False)
