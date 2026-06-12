@@ -68,7 +68,8 @@
     "phone": "الهاتف",
     "select": "اختيار",
     "active": "نشط",
-    "inactive": "غير نشط"
+    "inactive": "غير نشط",
+    "notes": "ملاحظات"
   },
   "dashboard": {
     "title": "لوحة التحكم",
@@ -82,6 +83,10 @@
   "product": {
     "sku": "وحدة حفظ المخزون (SKU)",
     "brand": "العلامة التجارية"
+  },
+  "inventory": {
+    "product": "المنتج",
+    "stock_pcs": "الكمية (قطع)"
   },
   "permission_denied": "ليس لديك صلاحية لهذا الإجراء"
 }

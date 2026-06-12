@@ -68,7 +68,8 @@
     "phone": "फ़ोन",
     "select": "चुनें",
     "active": "सक्रिय",
-    "inactive": "निष्क्रिय"
+    "inactive": "निष्क्रिय",
+    "notes": "टिप्पणी"
   },
   "dashboard": {
     "title": "डैशबोर्ड",
@@ -82,6 +83,10 @@
   "product": {
     "sku": "एसकेयू",
     "brand": "ब्रांड"
+  },
+  "inventory": {
+    "product": "उत्पाद",
+    "stock_pcs": "मात्रा (पीस)"
   },
   "permission_denied": "आपको इस क्रिया की अनुमति नहीं है"
 }

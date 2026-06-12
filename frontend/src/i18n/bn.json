@@ -83,7 +83,8 @@
     "saving": "সংরক্ষণ করা হচ্ছে...",
     "create": "তৈরি করুন",
     "update": "হালনাগাদ করুন",
-    "name": "নাম"
+    "name": "নাম",
+    "notes": "নোট"
   },
   "dashboard": {
     "title": "ড্যাশবোর্ড",
@@ -156,7 +157,9 @@
     "total_sell_value": "মোট বিক্রয় মূল্য",
     "low_stock_items": "কম স্টক পণ্য",
     "in_stock": "স্টকে আছে",
-    "show_low_stock_only": "শুধু কম স্টক দেখান"
+    "show_low_stock_only": "শুধু কম স্টক দেখান",
+    "product": "পণ্য",
+    "stock_pcs": "পরিমাণ (পিস)"
   },
   "supplier": {
     "name": "নাম",

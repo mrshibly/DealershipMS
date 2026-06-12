@@ -83,7 +83,8 @@
     "saving": "Saving...",
     "create": "Create",
     "update": "Update",
-    "name": "Name"
+    "name": "Name",
+    "notes": "Notes"
   },
   "dashboard": {
     "title": "Dashboard",
@@ -156,7 +157,9 @@
     "total_sell_value": "Total Sell Value",
     "low_stock_items": "Low Stock Items",
     "in_stock": "In Stock",
-    "show_low_stock_only": "Show Low Stock Only"
+    "show_low_stock_only": "Show Low Stock Only",
+    "product": "Product",
+    "stock_pcs": "Quantity (Pcs)"
   },
   "supplier": {
     "name": "Name",
