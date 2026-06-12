@@ -58,7 +58,17 @@
     "page": "صفحة",
     "delete_confirm": "هل أنت متأكد أنك تريد حذف هذا العنصر؟",
     "delete_success": "تم حذف العنصر بنجاح",
-    "save_success": "تم الحفظ بنجاح"
+    "save_success": "تم الحفظ بنجاح",
+    "action": "الإجراء",
+    "actions": "الإجراءات",
+    "saving": "جاري الحفظ...",
+    "create": "إنشاء",
+    "update": "تحديث",
+    "name": "الاسم",
+    "phone": "الهاتف",
+    "select": "اختيار",
+    "active": "نشط",
+    "inactive": "غير نشط"
   },
   "dashboard": {
     "title": "لوحة التحكم",

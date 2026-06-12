@@ -21,7 +21,7 @@ export default function RoleList() {
         {v ? t('common.active') : t('common.inactive')}
       </span>
     )},
-    { key: 'actions', label: t('common.action'), render: (_, row) => (
+    { key: 'actions', label: t('common.actions'), render: (_, row) => (
       <button 
         onClick={() => navigate(`/settings/roles/${row.id}`)}
         className="text-primary hover:bg-primary/10 p-2 rounded-lg transition-colors"

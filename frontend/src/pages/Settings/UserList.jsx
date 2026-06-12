@@ -35,7 +35,7 @@ export default function UserList() {
         {v ? t('common.active') : t('common.inactive')}
       </span>
     )},
-    { key: 'actions', label: t('common.action'), render: (_, row) => (
+    { key: 'actions', label: t('common.actions'), render: (_, row) => (
       <div className="flex gap-2">
         <button 
           onClick={() => navigate(`/settings/users/${row.id}`)}
