@@ -11,6 +11,13 @@
 
 ---
 
+## 🌐 Live Deployments (Free Tiers)
+
+- **Frontend Client (Vercel):** [https://dms-frontend-wine.vercel.app](https://dms-frontend-wine.vercel.app)
+- **Backend API (Render):** [https://dms-backend-14ka.onrender.com](https://dms-backend-14ka.onrender.com)
+
+---
+
 ## 📋 Overview
 
 DMS is a comprehensive management platform for multi-route, multi-dealer distribution businesses in Bangladesh. It handles the full distribution lifecycle — from supplier purchases and inventory tracking, through dealer/shop/DSR management, to sales invoicing, collections, and financial reporting.
