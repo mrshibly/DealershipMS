@@ -53,3 +53,5 @@ coverage/
 # Generated / temp files (not for version control)
 prd_content.txt
 *.docx
+
+.vercel
