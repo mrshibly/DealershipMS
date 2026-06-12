@@ -49,7 +49,7 @@ export default function TargetList() {
         <div className="p-4 border-b border-border flex justify-between items-center">
             <div className="flex items-center gap-2 text-text-muted">
                 <TargetIcon className="w-5 h-5" />
-                <span className="font-medium">Monthly Targets</span>
+                <span className="font-medium">{t('targets.title', 'Monthly Targets')}</span>
             </div>
             <input 
                 type="month" 

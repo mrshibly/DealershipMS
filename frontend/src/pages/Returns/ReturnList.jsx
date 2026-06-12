@@ -36,7 +36,7 @@ export default function ReturnList() {
       <div className="card p-0 mt-6">
         <div className="p-4 border-b border-border flex items-center gap-2 text-text-muted">
             <RotateCcw className="w-5 h-5" />
-            <span className="font-medium">Merchandise Returns</span>
+            <span className="font-medium">{t('returns.title', 'Merchandise Returns')}</span>
         </div>
         <Table columns={columns} data={returns || []} loading={isLoading} />
       </div>

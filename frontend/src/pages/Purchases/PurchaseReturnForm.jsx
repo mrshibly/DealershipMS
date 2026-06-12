@@ -295,9 +295,9 @@ export default function PurchaseReturnForm() {
                     {t('product.pcs')}
                   </th>
                   <th className="text-left py-2 pr-3 font-medium text-text-muted">
-                    Return Price (৳)
+                    {t('purchase.buy_price')} (৳)
                   </th>
-                  <th className="text-left py-2 font-medium text-text-muted">Line Total</th>
+                  <th className="text-left py-2 font-medium text-text-muted">{t('purchase.line_total')}</th>
                   <th />
                 </tr>
               </thead>
