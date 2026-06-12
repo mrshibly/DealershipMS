@@ -45,23 +45,6 @@ DMS is a comprehensive management platform for multi-route, multi-dealer distrib
 
 ---
 
-## ✅ Sprint Progress
-
-| Sprint | Module | Status |
-|--------|--------|--------|
-| S0 | Foundation — Auth, RBAC, Docker, DB setup | ✅ Complete |
-| S1 | Products, Inventory, Suppliers, Purchases | ✅ Complete |
-| S2 | Routes, Dealers, Shops, DSRs | ✅ Complete |
-| S3 | Invoices & Collections | ✅ Complete |
-| S4 | Accounts & Finance | ✅ Complete |
-| S5 | Reports & Analytics | ✅ Complete |
-| S6 | Dashboard Charts | ✅ Complete |
-| S7 | Settings & SMS Automation | ✅ Complete |
-| S8 | DSR Targets & Returns | ✅ Complete |
-| S9 | QA & Production Deployment (Nginx + Locust) | ✅ Complete |
-
----
-
 ## 🚀 Getting Started
 
 ### Prerequisites
