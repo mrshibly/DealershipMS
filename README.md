@@ -48,8 +48,10 @@ DMS is a comprehensive management platform for multi-route, multi-dealer distrib
 | S3 | Invoices & Collections | ✅ Complete |
 | S4 | Accounts & Finance | ✅ Complete |
 | S5 | Reports & Analytics | ✅ Complete |
-| S6 | Dashboard Charts | 🔜 Planned |
-| S7 | SMS Notifications | 🔜 Planned |
+| S6 | Dashboard Charts | ✅ Complete |
+| S7 | Settings & SMS Automation | ✅ Complete |
+| S8 | DSR Targets & Returns | ✅ Complete |
+| S9 | QA & Production Deployment (Nginx + Locust) | ✅ Complete |
 
 ---
 
@@ -192,6 +194,44 @@ The UI supports 4 languages, switchable from the login page:
 | `en` | English |
 | `hi` | हिन्दी |
 | `ar` | عربي |
+
+---
+
+## 🧪 Testing & QA
+
+### Running Backend Tests
+To run backend unit and integration tests along with the coverage report:
+```bash
+cd backend
+pip install -r requirements.txt
+pytest --cov=app --cov-report=term-missing
+```
+
+### Running Load Tests
+We use **Locust** to load test heavy dashboard snapshot and daybook reporting endpoints.
+To run load tests locally:
+```bash
+pip install locust
+locust -f backend/tests/locustfile.py
+```
+Then open `http://localhost:8089` to configure and start the load test.
+
+---
+
+## 🚢 Production Deployment
+
+To run the application in a production environment (served using Nginx, optimized docker containers):
+
+```bash
+docker compose -f docker-compose.prod.yml up -d --build
+```
+
+This starts:
+- `dms_postgres_prod` — Production PostgreSQL database
+- `dms_redis_prod` — Redis queue
+- `dms_backend_prod` — FastAPI backend (without auto-reload)
+- `dms_worker_prod` — Celery background task worker
+- `dms_frontend_prod` — Built React frontend served by Nginx on port **80**
 
 ---
 
