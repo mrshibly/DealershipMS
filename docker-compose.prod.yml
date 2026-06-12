@@ -70,8 +70,8 @@ services:
 
   frontend:
     build:
-      context: ./frontend
-      dockerfile: Dockerfile.prod
+      context: .
+      dockerfile: frontend/Dockerfile.prod
     container_name: dms_frontend_prod
     restart: unless-stopped
     ports:
