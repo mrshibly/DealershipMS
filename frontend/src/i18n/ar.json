@@ -88,5 +88,8 @@
     "product": "المنتج",
     "stock_pcs": "الكمية (قطع)"
   },
+  "reports": {
+    "sales": "المبيعات"
+  },
   "permission_denied": "ليس لديك صلاحية لهذا الإجراء"
 }

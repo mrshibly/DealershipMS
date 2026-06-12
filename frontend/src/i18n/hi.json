@@ -88,5 +88,8 @@
     "product": "उत्पाद",
     "stock_pcs": "मात्रा (पीस)"
   },
+  "reports": {
+    "sales": "बिक्री"
+  },
   "permission_denied": "आपको इस क्रिया की अनुमति नहीं है"
 }
