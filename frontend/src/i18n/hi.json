@@ -79,5 +79,9 @@
     "low_stock": "कम स्टॉक",
     "daily_balance": "दैनिक शेष"
   },
+  "product": {
+    "sku": "एसकेयू",
+    "brand": "ब्रांड"
+  },
   "permission_denied": "आपको इस क्रिया की अनुमति नहीं है"
 }

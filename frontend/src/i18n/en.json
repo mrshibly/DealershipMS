@@ -142,7 +142,9 @@
     "description": "Description",
     "no_category": "No Category",
     "auto_generated": "Auto Generated",
-    "optional": "Optional"
+    "optional": "Optional",
+    "sku": "SKU",
+    "brand": "Brand"
   },
   "inventory": {
     "cartons": "Cartons",

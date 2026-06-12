@@ -142,7 +142,9 @@
     "description": "বিবরণ",
     "no_category": "কোনো ক্যাটাগরি নেই",
     "auto_generated": "স্বয়ংক্রিয়",
-    "optional": "ঐচ্ছিক"
+    "optional": "ঐচ্ছিক",
+    "sku": "এসকেইউ",
+    "brand": "ব্র্যান্ড"
   },
   "inventory": {
     "cartons": "কার্টন",
