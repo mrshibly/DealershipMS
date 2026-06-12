@@ -76,10 +76,21 @@ services:
     restart: unless-stopped
     ports:
       - "80:80"
+      - "443:443"
     depends_on:
       - backend
     environment:
       - VITE_API_BASE_URL=/api/v1
+
+  tunnel:
+    image: cloudflare/cloudflared:latest
+    container_name: dms_cloudflare_tunnel
+    restart: unless-stopped
+    environment:
+      - TUNNEL_TOKEN=${CLOUDFLARE_TUNNEL_TOKEN}
+    command: tunnel --no-autoupdate run
+    depends_on:
+      - frontend
 
 volumes:
   postgres_prod_data:
