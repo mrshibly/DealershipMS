@@ -62,13 +62,14 @@ async def get_daybook(db: AsyncSession, day: date) -> dict[str, Any]:
     # Prepare data for Excel/JSON
     transactions = []
     for c in col_list:
+        method_str = getattr(c.payment_method, "value", c.payment_method) if c.payment_method else "Unknown"
         transactions.append({
             "type": "Collection",
             "reference": c.invoice.invoice_no if c.invoice else str(c.id)[:8],
-            "account": c.payment_method.value if c.payment_method else "Unknown",
+            "account": method_str,
             "inflow": float(c.amount),
             "outflow": 0.0,
-            "narration": f"Collection from {c.payment_method.value if c.payment_method else ''}"
+            "narration": f"Collection from {method_str}"
         })
     for e in exp_list:
         transactions.append({

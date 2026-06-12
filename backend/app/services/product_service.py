@@ -171,8 +171,8 @@ async def create_product(
     )
     db.add(product)
     await db.commit()
-    await db.refresh(product, ["category"])
-    return await _enrich_product(db, product)
+    refreshed_product = await get_product(db, product.id)
+    return await _enrich_product(db, refreshed_product)
 
 
 async def update_product(
@@ -185,8 +185,8 @@ async def update_product(
     for key, value in update_data.items():
         setattr(product, key, value)
     await db.commit()
-    await db.refresh(product, ["category"])
-    return await _enrich_product(db, product)
+    refreshed_product = await get_product(db, product_id)
+    return await _enrich_product(db, refreshed_product)
 
 
 async def delete_product(db: AsyncSession, product_id: uuid.UUID) -> bool:

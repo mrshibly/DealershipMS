@@ -1,0 +1,13 @@
+# Ignore folders that cause high resource usage / indexing issues
+node_modules/
+frontend/node_modules/
+dist/
+frontend/dist/
+.git/
+.pytest_cache/
+backend/.pytest_cache/
+__pycache__/
+backend/__pycache__/
+*.txt
+*.log
+backend_docker_logs.txt
